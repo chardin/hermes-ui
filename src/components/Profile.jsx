@@ -1,44 +1,42 @@
-import { useState } from 'react'
-import axios from 'axios';
+import { useState, useEffect } from 'react'
+import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+import { Link } from 'react-router-dom';
 
 function Profile(props) {
-
-    const [profileData, setProfileData] = useState(null)
-    function getData() {
-	axios({
-	    method: 'GET',
-	    url: '/api/profile',
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+	fetch('http://localhost:5000/api/profile', {
 	    headers: {
 		Authorization: 'Bearer ' + props.token
 	    }
 	})
-        .then((response) => {
-	    const res = response.data
-	    console.log(res)
-	    res.access_token && props.setToken(res.access_token)
-	    setProfileData(({
-		username: res.user.username,
-		fullName: res.user.full_name}))
-	}).catch((error) => {
-	    if (error.response) {
-		console.log(error.response)
-		console.log(error.response.status)
-		console.log(error.response.headers)
-	    }
-	})}
-
+        .then((response) => response.json())
+	.then((json) => {
+	    setData(json);
+	    setLoading(false);})
+	.catch((error) => console.error('Error fetching data:', error));
+    }, []);
+    if (loading) return <p>Loading...</p>;
     return (
 	<div className='Profile'>
-
-            <p>To get your profile details: </p><button onClick={getData}>Click me</button>
-            {profileData && <div>
-				<p>Username: {profileData.username}</p>
-				<p>Full name: {profileData.fullName}</p>
-			    </div>
-            }
+         <div>
+	     <p>Username: {data.user.username}</p>
+	     <p>Full name: {data.user.full_name}</p>
+	     <Sidebar backgroundColor="#284177">
+		 <Menu>
+		     <SubMenu label="Routines" backgroundColor="#284177">
+			 {data.routines.map((routine) => (
+			     <MenuItem backgroundColor="#284177"> {routine.name} </MenuItem>
+			 ))}
+		     </SubMenu>
+		 </Menu>
+	     </Sidebar>
+	 </div>
 
 	</div>
     );
+    
 }
-
 export default Profile;

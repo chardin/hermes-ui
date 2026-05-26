@@ -11,9 +11,9 @@ function Header(props) {
 	    props.token()
 	}).catch((error) => {
 	    if (error.response) {
-		console.log(error.response)
-		console.log(error.response.status)
-		console.log(error.response.headers)
+		console.log('response = ' + error.response);
+		console.log('status = ' + error.response.status);
+		console.log('headers = ' + error.response.headers);
 	    }
 	})}
 
