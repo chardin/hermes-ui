@@ -17,7 +17,7 @@ function Profile(props) {
 	})
 	.then((response) => {
 	    if (!response.ok) {
-		throw new Error(`HTTP error! Status: ${response.status}`);
+		throw new Error("HTTP error! Status: ${response.status}");
 	    }
 	    return response.blob();
 	})
@@ -26,18 +26,15 @@ function Profile(props) {
 	})
 	.then((blobUrl) => {
 	    setBlobUrl(blobUrl);
-	});
-	
-	console.log(blobUrl);
+	    if (blobUrl) {
+		setWidget(
 
-	if (blobUrl) {
-	    setWidget(
-		<div>
-		    <audio controls src={blobUrl} />
-		</div>
-	    );
-	    console.log(blobUrl);
-	}
+		    <div>
+			<audio controls src={blobUrl} />
+		    </div>
+		);
+	    }
+	});
     };
 
     useEffect(() => {
@@ -57,8 +54,7 @@ function Profile(props) {
     if (loading) return <p>Loading...</p>;
     return (
 	<div className='Profile'>
-            <div>
-		<p>Welcome, {data.user.full_name}</p>
+            <div style={{ display: 'flex', height: '100vh', minHeight: '100vh' }}>
 		<Sidebar backgroundColor="#284177">
 		    <Menu
 			menuItemStyles={{
@@ -82,6 +78,8 @@ function Profile(props) {
 				color: '#EDE8E4',
 			    },
 			}}>
+			<MenuItem>Welcome, {data.user.full_name}</MenuItem>
+
 			<SubMenu label="Play Routine">
 			    {data.routines.map((routine) => (
 				<MenuItem key={routine.audio_path} onClick={(event) => {PlayAudio(event, routine.audio_path)}}> {routine.name} </MenuItem>
@@ -97,9 +95,11 @@ function Profile(props) {
 			
 		    </Menu>
 		</Sidebar>
-	    </div>
-	    <div>
-		{widget ? widget : ''}
+		<main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto' }}>
+		    <div>
+			{widget ? widget : ''}
+		    </div>
+		</main>
 	    </div>
 	</div>
     );
