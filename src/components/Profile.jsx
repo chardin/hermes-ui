@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import { Link } from 'react-router-dom';
 import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
@@ -10,6 +10,8 @@ function Profile(props) {
     const [loading, setLoading] = useState(true);
     const [widget, setWidget] = useState(false);
     const [blobUrl, setBlobUrl] = useState(null);
+
+    const expandToSecondLevel = (level) => level < 2;
 
     const RecordHistory = async(routine_id) => {
 	fetch('/api/record_history/' + routine_id, {
@@ -44,7 +46,16 @@ function Profile(props) {
 		    throw new Error(json.error);
 		}
 		setWidget(
-		    <JsonView data={json.data} shouldExpandNode={allExpanded} style={darkStyles} />
+		    <div>
+			<dl>
+			    <dt>Name</dt>
+			    <dd>{json.data.name}</dd>
+			    <dt>Notes</dt>
+			    <dd>{json.data.notes ? json.data.notes : 'None'}</dd>
+			</dl>
+			<p>Exercise data:</p>
+			<JsonView data={json.data.exercises} shouldExpandNode={expandToSecondLevel} style={darkStyles} />
+		    </div>
 		);
 	    });
     }
