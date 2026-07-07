@@ -10,9 +10,31 @@ function Profile(props) {
     const [loading, setLoading] = useState(true);
     const [widget, setWidget] = useState(false);
     const [blobUrl, setBlobUrl] = useState(null);
-
+    const [wakeLock, setWakeLock] = useState(null);
+    
     const expandToSecondLevel = (level) => level < 2;
 
+    const requestWakeLock = async () => {
+	if (!('wakeLock' in navigator)) {
+	    alert('Wake Lock API is not supported.');
+	    return;
+	}
+	try {
+	    const lock = await navigator.wakeLock.request('screen');
+	    setWakeLock(lock);
+	    alert('Screen wake lock active!');
+	} catch (err) {
+	    console.error(`${err.name}, ${err.message}`);
+	}
+    };
+
+    const releaseWakeLock = async () => {
+	if (wakeLock) {
+	    await wakeLock.release();
+	    setWakeLock(null);
+	}
+    };
+    
     const RecordHistory = async(routine_id) => {
 	fetch('/api/record_history/' + routine_id, {
 	    headers: {
@@ -80,6 +102,9 @@ function Profile(props) {
 	    if (blobUrl) {
 		setWidget(
 		    <div>
+			<button onClick={wakeLock ? releaseWakeLock : requestWakeLock}>
+			    {wakeLock ? 'Release Screen Lock' : 'Keep Screen Awake'}
+			</button>
 			<audio controls src={blobUrl} />
 			<br />
 			<button onClick={() => RecordHistory(routine_id)}>
