@@ -23,7 +23,7 @@ function Header(props) {
 	    <img 
 		src={heroImage} 
 		alt="Hero Background" 
-		fetchpriority="high" 
+		fetchPriority="high" 
 	    />
 	    <br />
             <button onClick={logMeOut}> 
