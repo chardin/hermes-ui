@@ -11,6 +11,8 @@
     "start-backend": "cd $HERMES_SRC_DIR && /usr/bin/env flask run --no-debugger --debug --host=0.0.0.0"
   },
   "dependencies": {
+    "@mui/icons-material": "^9.2.0",
+    "@mui/material": "^9.2.0",
     "axios": "^1.15.2",
     "react": "^19.2.5",
     "react-audio-play": "^1.0.4",
