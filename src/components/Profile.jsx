@@ -37,9 +37,19 @@ function Profile(props) {
 	    if (!response.ok) {
 		throw new Error("HTTP error! Status: ${response.status}");
 	    }
-	    setWidget(
-		<p>Saved!</p>
-	    );
+	    return response.json();
+	})
+	.then((json) => {
+	    if (json.success) {
+		setWidget(
+		    <p>Saved!</p>
+		);
+	    }
+	    else {
+		setWidget(
+		    <p>Error: {json.error}</p>
+		);
+	    }
 	});
     }
 
@@ -55,10 +65,8 @@ function Profile(props) {
 	    }
 	    return response.json();
 	})
-	    .then((json) => {
-		if (!json.success) {
-		    throw new Error(json.error);
-		}
+	.then((json) => {
+	    if (json.success) {
 		setWidget(
 		    <div>
 			<dl>
@@ -71,7 +79,15 @@ function Profile(props) {
 			<JsonView data={json.data.exercises} shouldExpandNode={expandToSecondLevel} style={darkStyles} />
 		    </div>
 		);
-	    });
+	    }
+	    else {
+		setWidget(
+		    <div>
+			<p>Error: {json.error}</p>
+		    </div>
+		);
+	    }
+	});
     }
     
     const PlayAudio = async(event, routine_path, routine_id) => {
@@ -107,34 +123,42 @@ function Profile(props) {
 		'Authorization': 'Bearer ' + props.token,
 	    },
 	})
-	    .then((response) => response.json())
-	    .then((entries) => {
-		if (entries) {
-		    setWidget(
-			<div>
-			    <table style={{ width: '100%'}}>
-				<thead>
-				    <tr>
-					<th>Date</th>
-					<th>Routine</th>
-					<th>Details</th>
+	.then((response) => response.json())
+	.then((json) => {
+	    console.log(json);
+	    if (json.success) {
+		setWidget(
+		    <div>
+			<table style={{ width: '100%'}}>
+			    <thead>
+				<tr>
+				    <th>Date</th>
+				    <th>Routine</th>
+				    <th>Details</th>
+				</tr>
+			    </thead>
+			    <tbody>
+				{json.history.map((entry) => (
+				    <tr key={entry.history_id}>
+					<td>{entry.datetime}</td>
+					<td>{entry.name}</td>
+					<td><button onClick={() => HistoryItem(entry.history_id)}>Details</button></td>
 				    </tr>
-				</thead>
-				<tbody>
-				    {entries.map((entry) => (
-					<tr key={entry.history_id}>
-					    <td>{entry.datetime}</td>
-					    <td>{entry.name}</td>
-					    <td><button onClick={() => HistoryItem(entry.history_id)}>Details</button></td>
-					</tr>
-				    ))}
-				</tbody>
-			    </table>
-			    
-			</div>
-		    );
-		}
-	    });
+				))}
+			    </tbody>
+			</table>
+			
+		    </div>
+		);
+	    }
+	    else {
+		setWidget(
+		    <div>
+			<p>Error: {json.error}</p>
+		    </div>
+		);
+	    }
+	});
     }
 
     useEffect(() => {
