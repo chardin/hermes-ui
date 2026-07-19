@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+import "react-bootstrap-submenu/dist/index.css"
+import { Navbar, Nav } from "react-bootstrap";
+import { NavDropdownMenu, DropdownSubmenu, MenuItem } from 'react-bootstrap-submenu';
+import 'react-bootstrap-submenu/dist/index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
@@ -179,45 +183,26 @@ function Profile(props) {
     return (
 	<div className='Profile'>
             <div style={{ display: 'flex', height: '100vh', minHeight: '100vh' }}>
-		<Sidebar backgroundColor="#284177">
-		    <Menu
-			menuItemStyles={{
-			    button: {
-				color: '#83CEEC',
-				backgroundColor: '#006BBD',
-				'&:hover': {
-				    backgroundColor: '#284177',
-				    color: '#006BBD',
-				},
-				'&.active': {
-				    backgroundColor: '#EDE8E4',
-				    color: '#006BBD',
-				},
-			    },
-			    label: {
-				fontWeight: 'bold',
-				color: '#EDE8E4',
-			    },
-			    icon: {
-				color: '#EDE8E4',
-			    },
-			}}>
-			<SubMenu label="Play Routine">
-			    {data.routines.map((routine) => (
-				<MenuItem key={routine.audio_path} onClick={(event) => {PlayAudio(event, routine.audio_path, routine.routine_id)}}> {routine.name} </MenuItem>
-			    ))}
-			</SubMenu>
-			<SubMenu label="Edit Data">
-			    <SubMenu label="Routines">
-				{data.routines.map((routine) => (
-				    <MenuItem key={routine.audio_path}> {routine.name} </MenuItem>
-				))}
-			    </SubMenu>	
-			</SubMenu>
-			<MenuItem key='history_list' onClick={(event) => {GetHistoryList(event, 0, 0)}}> Past History </MenuItem>
-			
-		    </Menu>
-		</Sidebar>
+		    <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar.Brand href="#home">Brand</Navbar.Brand>
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="me-auto">
+          <Nav.Link href="#home">Home</Nav.Link>
+          
+          <NavDropdownMenu title="Dropdown" id="basic-nav-dropdown">
+            <MenuItem href="#action/3.1">Action</MenuItem>
+            <MenuItem href="#action/3.2">Another action</MenuItem>
+            
+            <DropdownSubmenu title="Submenu Level 1">
+              <MenuItem href="#action/3.3">Submenu Action</MenuItem>
+              <MenuItem href="#action/3.4">Another Submenu Action</MenuItem>
+            </DropdownSubmenu>
+            
+          </NavDropdownMenu>
+        </Nav>
+	  </Navbar.Collapse>
+    </Navbar>
 		<main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto' }}>
 		    <p>Welcome, {data.user.full_name}</p>
 
