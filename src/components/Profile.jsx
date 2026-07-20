@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import { Link } from 'react-router-dom';
 import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
-
+import Navbar from './Navbar';
 
 function Profile(props) {
     const [data, setData] = useState([]);
@@ -176,48 +175,30 @@ function Profile(props) {
     
     }, []);
     if (loading) return <p>Loading...</p>;
+    const menuData = [
+	{ title: 'Home', url: '/' },
+	{
+	    title: 'Services',
+	    url: '/services',
+	    submenu: [
+		{ title: 'Web Design', url: '/web-design' },
+		{
+		    title: 'Development',
+		    url: '/dev',
+		    submenu: [
+			{ title: 'Frontend', url: '/frontend' },
+			{ title: 'Backend', url: '/backend' },
+		    ],
+		},
+		{ title: 'SEO', url: '/seo' },
+	    ],
+	},
+	{ title: 'About', url: '/about' },
+    ];
     return (
 	<div className='Profile'>
             <div style={{ display: 'flex', height: '100vh', minHeight: '100vh' }}>
-		<Sidebar backgroundColor="#284177">
-		    <Menu
-			menuItemStyles={{
-			    button: {
-				color: '#83CEEC',
-				backgroundColor: '#006BBD',
-				'&:hover': {
-				    backgroundColor: '#284177',
-				    color: '#006BBD',
-				},
-				'&.active': {
-				    backgroundColor: '#EDE8E4',
-				    color: '#006BBD',
-				},
-			    },
-			    label: {
-				fontWeight: 'bold',
-				color: '#EDE8E4',
-			    },
-			    icon: {
-				color: '#EDE8E4',
-			    },
-			}}>
-			<SubMenu label="Play Routine">
-			    {data.routines.map((routine) => (
-				<MenuItem key={routine.audio_path} onClick={(event) => {PlayAudio(event, routine.audio_path, routine.routine_id)}}> {routine.name} </MenuItem>
-			    ))}
-			</SubMenu>
-			<SubMenu label="Edit Data">
-			    <SubMenu label="Routines">
-				{data.routines.map((routine) => (
-				    <MenuItem key={routine.audio_path}> {routine.name} </MenuItem>
-				))}
-			    </SubMenu>	
-			</SubMenu>
-			<MenuItem key='history_list' onClick={(event) => {GetHistoryList(event, 0, 0)}}> Past History </MenuItem>
-			
-		    </Menu>
-		</Sidebar>
+		<Navbar data={menuData} />
 		<main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto' }}>
 		    <p>Welcome, {data.user.full_name}</p>
 
