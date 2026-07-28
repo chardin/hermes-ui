@@ -89,7 +89,7 @@ function Profile(props) {
 	});
     }
     
-    const PlayAudio = async(event, routine_path, routine_id) => {
+    function PlayAudio(routine_path, routine_id){
 	fetch(routine_path, {
 	    headers: {
 		'Authorization': 'Bearer ' + props.token,
@@ -116,7 +116,7 @@ function Profile(props) {
 	});
     };
 
-    const GetHistoryList = async(event, page_num, num_rows) => {
+    const GetHistoryList = async(page_num, num_rows) => {
 	fetch('/api/routine_history/' + page_num + '/' + num_rows, {
 	    headers: {
 		'Authorization': 'Bearer ' + props.token,
@@ -171,30 +171,29 @@ function Profile(props) {
 	    setData(json);
 	    setLoading(false);}
 	)
-	.catch((error) => console.error('Error fetching data:', error));
-    
+	    .catch((error) => console.error('Error fetching data:', error));
+	menuData = false;
     }, []);
     if (loading) return <p>Loading...</p>;
-    const menuData = [
-	{ title: 'Home', url: '/' },
-	{
-	    title: 'Services',
-	    url: '/services',
-	    submenu: [
-		{ title: 'Web Design', url: '/web-design' },
-		{
-		    title: 'Development',
-		    url: '/dev',
-		    submenu: [
-			{ title: 'Frontend', url: '/frontend' },
-			{ title: 'Backend', url: '/backend' },
-		    ],
-		},
-		{ title: 'SEO', url: '/seo' },
-	    ],
-	},
-	{ title: 'About', url: '/about' },
-    ];
+    if (!menuData) {
+	menuData = [
+	    {
+		title: 'Play Routine',
+		url: '#',
+		submenu: data.routines.map((routine) => (
+		    { title: routine.name,
+		      url: '#',
+		      onClick: {() => PlayAudio({routine.audio_path}, {routine.routine_id})}
+		    }))
+	    },
+	    {
+		title: 'Past History',
+		url: '#',
+		onClick: GetHistoryList(0, 0)
+	    },
+	];
+    }
+    
     return (
 	<div className='Profile'>
             <div style={{ display: 'flex', height: '100vh', minHeight: '100vh' }}>
