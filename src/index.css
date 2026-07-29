@@ -140,7 +140,7 @@ audio {
   position: relative; /* Context anchor for absolute children */
 }
 
-.menu-items a, .menu-items button {
+.menu-items a, .menu-items button, .menu-items p {
   display: block;
   padding: 15px 20px;
   color: #EDE8E4;

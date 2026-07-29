@@ -168,6 +168,25 @@ function Profile(props) {
 				    </tr>
 				))}
 			    </tbody>
+			    <tfoot>
+				<tr>
+				    <th>
+					{page_num > 0 ? (
+					    <div><button onClick={() => GetHistoryList(page_num - 1, num_rows)}>&larr;</button></div>
+					) : (
+					    ' ')
+					}
+				    </th>
+				    <th>&nbsp;</th>
+				    <th>
+					{json.next_page ? (
+					    <div><button onClick={() => GetHistoryList(page_num + 1, num_rows)}>&rarr;</button></div>
+					) : (
+					    ' '
+					)}
+				    </th>
+				</tr>
+			    </tfoot>
 			</table>
 			
 		    </div>
