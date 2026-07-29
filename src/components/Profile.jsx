@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import Navbar from './Navbar';
-import heroImage from '../assets/hero.png';
+import heroImage from '../assets/hero-small.png';
 
 function Profile(props) {
     const [data, setData] = useState([]);
@@ -201,8 +201,10 @@ function Profile(props) {
     if (!menuData) {
 	setMenuData([
 	    {
-		title: 'Welcome, ' + data.user.full_name,
-		url: '/profile'
+		img: heroImage
+	    },
+	    {
+		text: 'Welcome, ' + data.user.full_name
 	    },
 	    {
 		title: 'Play Routine',
@@ -232,12 +234,6 @@ function Profile(props) {
             <div style={{ display: 'block', height: '100vh', minHeight: '100vh' }}>
 		<Navbar data={menuData} />
 		<main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'block' }}>
-		    <img 
-			src={heroImage} 
-			alt="Hero Background" 
-			fetchPriority="high" 
-		    />
-		    <hr />
 		    <div>
 			{widget ? widget : ''}
 		    </div>
