@@ -223,10 +223,15 @@ function Profile(props) {
 		img: heroImage
 	    },
 	    {
-		text: 'Welcome, ' + data.user.full_name
+		title: 'Profile',
+		url: '#',
+		submenu: [
+		    { text: 'Username: ' + data.user.username },
+		    { text: 'Full name: ' + data.user.full_name }
+		]
 	    },
 	    {
-		title: 'Play Routine',
+		title: 'Play',
 		url: '#',
 		submenu: data.routines.map((routine) => (
 		    { title: routine.name,
@@ -235,7 +240,7 @@ function Profile(props) {
 		    }))
 	    },
 	    {
-		title: 'Past History',
+		title: 'History',
 		url: '#',
 		onClick: () => GetHistoryList(0, 0)
 	    },
