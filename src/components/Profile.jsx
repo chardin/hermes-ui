@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import Navbar from './Navbar';
+import heroImage from '../assets/hero.png';
 
 function Profile(props) {
     const [data, setData] = useState([]);
@@ -14,10 +15,9 @@ function Profile(props) {
 
     const expandToSecondLevel = (level) => level < 2;
 
-    function logMeOut() {
-	axios({
+    const logMeOut = async() => {
+	fetch('/api/invalidate', {
 	    method: 'POST',
-	    url: '/api/invalidate',
 	})
 	.then((response) => {
 	    props.token()
@@ -109,6 +109,11 @@ function Profile(props) {
     }
     
     function PlayAudio(routine_path, routine_id){
+	setWidget(
+	    <div>
+		<p>Fetching...</p>
+	    </div>
+	);
 	fetch(routine_path, {
 	    headers: {
 		'Authorization': 'Bearer ' + props.token,
@@ -196,6 +201,10 @@ function Profile(props) {
     if (!menuData) {
 	setMenuData([
 	    {
+		title: 'Welcome, ' + data.user.full_name,
+		url: '/profile'
+	    },
+	    {
 		title: 'Play Routine',
 		url: '#',
 		submenu: data.routines.map((routine) => (
@@ -208,17 +217,27 @@ function Profile(props) {
 		title: 'Past History',
 		url: '#',
 		onClick: () => GetHistoryList(0, 0)
-	    },	    
+	    },
+	    {
+		title: 'Logout',
+		url: '#',
+		onClick: () => logMeOut()
+	    },
+	    
 	]);
     }
     
     return (
 	<div className='Profile'>
-            <div style={{ display: 'flex', height: '100vh', minHeight: '100vh' }}>
+            <div style={{ display: 'block', height: '100vh', minHeight: '100vh' }}>
 		<Navbar data={menuData} />
-		<main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto' }}>
-		    <p>Welcome, {data.user.full_name}</p>
-
+		<main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'block' }}>
+		    <img 
+			src={heroImage} 
+			alt="Hero Background" 
+			fetchPriority="high" 
+		    />
+		    <hr />
 		    <div>
 			{widget ? widget : ''}
 		    </div>

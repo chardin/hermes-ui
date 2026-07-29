@@ -1,14 +1,8 @@
 import MenuItems from './MenuItems';
-import heroImage from '../assets/hero.png';
 
 const Navbar = ({ data }) => {
   return (
-    <nav className="navbar">
-	    <img 
-		src={heroImage} 
-		alt="Hero Background" 
-		fetchPriority="high" 
-	    />
+      <nav className="navbar">
       <ul className="menus">
         {data.map((menu, index) => {
           const depthLevel = 0;
