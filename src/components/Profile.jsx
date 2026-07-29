@@ -10,9 +10,28 @@ function Profile(props) {
     const [widget, setWidget] = useState(false);
     const [blobUrl, setBlobUrl] = useState(null);
     const [wakeLock, setWakeLock] = useState(null);
-    
+    const [menuData, setMenuData] = useState(null);
+
     const expandToSecondLevel = (level) => level < 2;
 
+    function logMeOut() {
+	axios({
+	    method: 'POST',
+	    url: '/api/invalidate',
+	})
+	.then((response) => {
+	    props.token()
+	})
+	.catch((error) => {
+	    if (error.response) {
+		console.log('response = ' + error.response);
+		console.log('status = ' + error.response.status);
+		console.log('headers = ' + error.response.headers);
+	    }
+	})
+    }
+
+    
     const requestWakeLock = async () => {
 	if (!('wakeLock' in navigator)) {
 	    alert('Wake Lock API is not supported.');
@@ -124,7 +143,6 @@ function Profile(props) {
 	})
 	.then((response) => response.json())
 	.then((json) => {
-	    console.log(json);
 	    if (json.success) {
 		setWidget(
 		    <div>
@@ -172,26 +190,26 @@ function Profile(props) {
 	    setLoading(false);}
 	)
 	    .catch((error) => console.error('Error fetching data:', error));
-	menuData = false;
+	setMenuData(false);
     }, []);
     if (loading) return <p>Loading...</p>;
     if (!menuData) {
-	menuData = [
+	setMenuData([
 	    {
 		title: 'Play Routine',
 		url: '#',
 		submenu: data.routines.map((routine) => (
 		    { title: routine.name,
 		      url: '#',
-		      onClick: {() => PlayAudio({routine.audio_path}, {routine.routine_id})}
+		      onClick: () => PlayAudio(routine.audio_path, routine.routine_id)
 		    }))
 	    },
 	    {
 		title: 'Past History',
 		url: '#',
-		onClick: GetHistoryList(0, 0)
-	    },
-	];
+		onClick: () => GetHistoryList(0, 0)
+	    },	    
+	]);
     }
     
     return (
