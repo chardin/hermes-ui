@@ -194,7 +194,7 @@ function Profile(props) {
 	    setData(json);
 	    setLoading(false);}
 	)
-	    .catch((error) => console.error('Error fetching data:', error));
+	.catch((error) => console.error('Error fetching data:', error));
 	setMenuData(false);
     }, []);
     if (loading) return <p>Loading...</p>;
