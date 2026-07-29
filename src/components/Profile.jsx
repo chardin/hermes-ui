@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import { Link } from 'react-router-dom';
 import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
-
+import Navbar from './Navbar';
+import heroImage from '../assets/hero.png';
 
 function Profile(props) {
     const [data, setData] = useState([]);
@@ -11,9 +11,27 @@ function Profile(props) {
     const [widget, setWidget] = useState(false);
     const [blobUrl, setBlobUrl] = useState(null);
     const [wakeLock, setWakeLock] = useState(null);
-    
+    const [menuData, setMenuData] = useState(null);
+
     const expandToSecondLevel = (level) => level < 2;
 
+    const logMeOut = async() => {
+	fetch('/api/invalidate', {
+	    method: 'POST',
+	})
+	.then((response) => {
+	    props.token()
+	})
+	.catch((error) => {
+	    if (error.response) {
+		console.log('response = ' + error.response);
+		console.log('status = ' + error.response.status);
+		console.log('headers = ' + error.response.headers);
+	    }
+	})
+    }
+
+    
     const requestWakeLock = async () => {
 	if (!('wakeLock' in navigator)) {
 	    alert('Wake Lock API is not supported.');
@@ -90,7 +108,12 @@ function Profile(props) {
 	});
     }
     
-    const PlayAudio = async(event, routine_path, routine_id) => {
+    function PlayAudio(routine_path, routine_id){
+	setWidget(
+	    <div>
+		<p>Fetching...</p>
+	    </div>
+	);
 	fetch(routine_path, {
 	    headers: {
 		'Authorization': 'Bearer ' + props.token,
@@ -117,7 +140,7 @@ function Profile(props) {
 	});
     };
 
-    const GetHistoryList = async(event, page_num, num_rows) => {
+    const GetHistoryList = async(page_num, num_rows) => {
 	fetch('/api/routine_history/' + page_num + '/' + num_rows, {
 	    headers: {
 		'Authorization': 'Bearer ' + props.token,
@@ -125,7 +148,6 @@ function Profile(props) {
 	})
 	.then((response) => response.json())
 	.then((json) => {
-	    console.log(json);
 	    if (json.success) {
 		setWidget(
 		    <div>
@@ -173,54 +195,49 @@ function Profile(props) {
 	    setLoading(false);}
 	)
 	.catch((error) => console.error('Error fetching data:', error));
-    
+	setMenuData(false);
     }, []);
     if (loading) return <p>Loading...</p>;
+    if (!menuData) {
+	setMenuData([
+	    {
+		title: 'Welcome, ' + data.user.full_name,
+		url: '/profile'
+	    },
+	    {
+		title: 'Play Routine',
+		url: '#',
+		submenu: data.routines.map((routine) => (
+		    { title: routine.name,
+		      url: '#',
+		      onClick: () => PlayAudio(routine.audio_path, routine.routine_id)
+		    }))
+	    },
+	    {
+		title: 'Past History',
+		url: '#',
+		onClick: () => GetHistoryList(0, 0)
+	    },
+	    {
+		title: 'Logout',
+		url: '#',
+		onClick: () => logMeOut()
+	    },
+	    
+	]);
+    }
+    
     return (
 	<div className='Profile'>
-            <div style={{ display: 'flex', height: '100vh', minHeight: '100vh' }}>
-		<Sidebar backgroundColor="#284177">
-		    <Menu
-			menuItemStyles={{
-			    button: {
-				color: '#83CEEC',
-				backgroundColor: '#006BBD',
-				'&:hover': {
-				    backgroundColor: '#284177',
-				    color: '#006BBD',
-				},
-				'&.active': {
-				    backgroundColor: '#EDE8E4',
-				    color: '#006BBD',
-				},
-			    },
-			    label: {
-				fontWeight: 'bold',
-				color: '#EDE8E4',
-			    },
-			    icon: {
-				color: '#EDE8E4',
-			    },
-			}}>
-			<SubMenu label="Play Routine">
-			    {data.routines.map((routine) => (
-				<MenuItem key={routine.audio_path} onClick={(event) => {PlayAudio(event, routine.audio_path, routine.routine_id)}}> {routine.name} </MenuItem>
-			    ))}
-			</SubMenu>
-			<SubMenu label="Edit Data">
-			    <SubMenu label="Routines">
-				{data.routines.map((routine) => (
-				    <MenuItem key={routine.audio_path}> {routine.name} </MenuItem>
-				))}
-			    </SubMenu>	
-			</SubMenu>
-			<MenuItem key='history_list' onClick={(event) => {GetHistoryList(event, 0, 0)}}> Past History </MenuItem>
-			
-		    </Menu>
-		</Sidebar>
-		<main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto' }}>
-		    <p>Welcome, {data.user.full_name}</p>
-
+            <div style={{ display: 'block', height: '100vh', minHeight: '100vh' }}>
+		<Navbar data={menuData} />
+		<main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'block' }}>
+		    <img 
+			src={heroImage} 
+			alt="Hero Background" 
+			fetchPriority="high" 
+		    />
+		    <hr />
 		    <div>
 			{widget ? widget : ''}
 		    </div>
