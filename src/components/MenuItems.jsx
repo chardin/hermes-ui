@@ -18,7 +18,7 @@ function itemCode(item, dropdown, depthLevel) {
     }
     if (item.img) {
 	return (
-	    <img src={item.img} />
+	    <a href={item.url} onClick={item.onClick}><img src={item.img} /></a>
 	);
     }
     if (item.text) {

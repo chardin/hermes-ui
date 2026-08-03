@@ -301,7 +301,9 @@ function Profile(props) {
     if (!menuData) {
 	setMenuData([
 	    {
-		img: heroImage
+		img: heroImage,
+		url: "#",
+		onClick: () => setWidget(<div></div>)
 	    },
 	    {
 		title: 'User',
