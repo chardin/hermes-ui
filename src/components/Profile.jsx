@@ -20,7 +20,7 @@ function Profile(props) {
 	    method: 'POST',
 	})
 	.then((response) => {
-	    props.token()
+	    props.removeToken()
 	})
 	.catch((error) => {
 	    if (error.response) {
@@ -319,7 +319,8 @@ function Profile(props) {
 		url: '#',
 		submenu: [
 		    { title: 'Info', url: '#', onClick: () => DisplayUser(data.user) },
-		    { title: 'Change Password', url: '#', onClick: () => ChangePassForm() }
+		    { title: 'Change Password', url: '#', onClick: () => ChangePassForm() },
+		    { title: 'Logout', url: '#', onClick: () => logMeOut() }
 		]
 	    },
 	    {
