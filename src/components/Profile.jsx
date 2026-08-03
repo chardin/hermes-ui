@@ -222,7 +222,7 @@ function Profile(props) {
 	    if (blobUrl) {
 		setWidget(
 		    <div>
-			<h2 style={{ textAlign: 'center' }}>{routine.name}</h2>
+			<h1 style={{ textAlign: 'center', color: '#EDE8E4' }}>{routine.name}</h1>
 			<audio controls src={blobUrl} onPlay={requestWakeLock} onEnded={() => RecordHistory(routine.routine_id)} />
 		    </div>
 		);
