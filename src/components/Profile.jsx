@@ -197,13 +197,13 @@ function Profile(props) {
 	});
     }
     
-    function PlayAudio(routine_path, routine_id){
+    function PlayAudio(routine){
 	setWidget(
 	    <div>
 		<p>Fetching...</p>
 	    </div>
 	);
-	fetch(routine_path, {
+	fetch(routine.audio_path, {
 	    headers: {
 		'Authorization': 'Bearer ' + props.token,
 	    },
@@ -222,7 +222,8 @@ function Profile(props) {
 	    if (blobUrl) {
 		setWidget(
 		    <div>
-			<audio controls src={blobUrl} onPlay={requestWakeLock} onEnded={() => RecordHistory(routine_id)} />
+			<h2 style={{ textAlign: 'center' }}>{routine.name}</h2>
+			<audio controls src={blobUrl} onPlay={requestWakeLock} onEnded={() => RecordHistory(routine.routine_id)} />
 		    </div>
 		);
 	    }
@@ -327,7 +328,7 @@ function Profile(props) {
 		submenu: data.routines.map((routine) => (
 		    { title: routine.name,
 		      url: '#',
-		      onClick: () => PlayAudio(routine.audio_path, routine.routine_id)
+		      onClick: () => PlayAudio(routine)
 		    }))
 	    },
 	    {
@@ -342,6 +343,7 @@ function Profile(props) {
 	<div className='Profile'>
             <div style={{ display: 'block', height: '100vh', minHeight: '100vh' }}>
 		<Navbar data={menuData} />
+		<br />
 		<main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'block' }}>
 		    <div>
 			{widget ? widget : ''}
