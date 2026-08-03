@@ -42,6 +42,14 @@ function Profile(props) {
 		    <dt>Full Name</dt>
 		    <dd>{user_data.full_name}</dd>		
 		</dl>
+		<dl>
+		    <dt>Admin?</dt>
+		    <dd>{user_data.is_admin ? 'Yes' : 'No'}</dd>		
+		</dl>
+		<dl>
+		    <dt>Timezone</dt>
+		    <dd>{user_data.timezone}</dd>		
+		</dl>
 	    </div>
 	);
     }
