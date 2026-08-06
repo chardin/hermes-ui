@@ -312,7 +312,7 @@ function Profile(props) {
 	    {
 		img: heroImage,
 		url: "#",
-		onClick: () => setWidget(<div></div>)
+		onClick: () => setWidget(<div>Enjoy prison, {data.user.full_name}!</div>)
 	    },
 	    {
 		title: 'User',

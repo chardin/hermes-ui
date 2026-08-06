@@ -7,7 +7,7 @@ function itemCode(item, dropdown, depthLevel) {
 		<>
 		    <button type="button" aria-haspopup="menu" aria-expanded={dropdown ? "true" : "false"}>
 			{item.title}{' '}
-			{depthLevel > 0 ? <span>&raquo;</span> : <span className="arrow" />}
+			{depthLevel > 0 ? <span>&nbsp;</span> : <span>&raquo;</span>}
 		    </button>
 		    <Dropdown 
 			submenus={item.submenu} 
