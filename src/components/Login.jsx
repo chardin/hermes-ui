@@ -18,7 +18,12 @@ function Login(props) {
             }
 	})
 	.then((response) => {
-	    props.setToken(response.data.access_token)
+	    if (response.data.success) {
+		props.setToken(response.data.access_token);
+	    }
+	    else {
+		console.log(response.data.error);
+	    }
 	}).catch((error) => {
 	    if (error.response) {
 		console.log('response = ' + error.response);
