@@ -186,16 +186,16 @@ audio {
 }
 
 audio::-webkit-media-controls-panel {
-  background-color: #006BBD;
+  background-color: #83CEEC;
 }
 
 audio::-webkit-media-controls-current-time-display,
 audio::-webkit-media-controls-time-remaining-display {
-    color: #EDE8E4;
+    color: #284177;
 }
 
 audio::-webkit-media-controls-timeline {
-    color: #EDE8E4;
+    color: #284177;
 }
 
 audio::-webkit-media-controls-enclosure {
