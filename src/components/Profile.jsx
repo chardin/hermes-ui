@@ -197,6 +197,36 @@ function Profile(props) {
 	});
     }
     
+    const Fortune = async() => {
+	fetch('/api/fortune', {
+	    headers: {
+		'Authorization': 'Bearer ' + props.token,
+	    },
+	})
+	.then((response) => {
+	    if (!response.ok) {
+		throw new Error("HTTP error! Status: ${response.status}");
+	    }
+	    return response.json();
+	})
+	.then((json) => {
+	    if (json.success) {
+		setWidget(
+		    <div>
+			{json.fortune}
+		    </div>
+		);
+	    }
+	    else {
+		setWidget(
+		    <div>
+			<p>Error: {json.error}</p>
+		    </div>
+		);
+	    }
+	});
+    }
+
     function PlayAudio(routine){
 	setWidget(
 	    <div>
@@ -312,7 +342,7 @@ function Profile(props) {
 	    {
 		img: heroImage,
 		url: "#",
-		onClick: () => setWidget(<div>Enjoy prison, {data.user.full_name}!</div>)
+		onClick: () => Fortune()
 	    },
 	    {
 		title: 'User',
