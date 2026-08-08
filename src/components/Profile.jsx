@@ -213,7 +213,7 @@ function Profile(props) {
 	    if (json.success) {
 		setWidget(
 		    <div>
-			{json.fortune}
+			<pre>{json.fortune}</pre>
 		    </div>
 		);
 	    }
