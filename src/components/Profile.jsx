@@ -250,10 +250,12 @@ function Profile(props) {
 	.then((blobUrl) => {
 	    setBlobUrl(blobUrl);
 	    if (blobUrl) {
+		let routineFilename = routine.name + '.mp3';
 		setWidget(
 		    <div>
 			<h1 style={{ textAlign: 'center', color: '#EDE8E4' }}>{routine.name}</h1>
 			<audio controls src={blobUrl} onPlay={requestWakeLock} onEnded={() => RecordHistory(routine.routine_id)} />
+			<h2 style={{ textAlign: 'center', color: '#EDE8E4' }}>or <a href={blobUrl} download={routineFilename} type="audio/mpeg">download the audio</a></h2>
 		    </div>
 		);
 	    }
