@@ -134,6 +134,40 @@ function Profile(props) {
 	}
     };
 
+    const saveNotes = (e) => {
+	e.preventDefault();
+	const form = event.target;
+	const formData = new FormData(form);
+	const formValues = Object.fromEntries(formData.entries());
+
+    	fetch('/api/save_notes', {
+	    method: 'POST',	    
+	    headers: {
+		'Authorization': 'Bearer ' + props.token,
+		'Content-Type': 'application/json',
+		'Accept': 'application/json',
+	    },
+	    body: JSON.stringify(formValues),
+	})
+	.then((response) => {
+	    if (!response.ok) {
+		throw new Error("HTTP error! Status: ${response.status}");
+	    }
+	    return response.json();
+	})
+	.then((json) => {
+	    if (json.success) {
+		HistoryItem(formValues.history_id);
+	    }
+	    else {
+		setWidget(
+		    <p>Error: {json.error}</p>
+		);
+	    }
+	});    
+
+    };
+    
     const RecordHistory = async(routine_id) => {
 	fetch('/api/record_history/' + routine_id, {
 	    headers: {
@@ -148,9 +182,7 @@ function Profile(props) {
 	})
 	.then((json) => {
 	    if (json.success) {
-		setWidget(
-		    <p>Saved!</p>
-		);
+		HistoryItem(json.history_id);
 	    }
 	    else {
 		setWidget(
@@ -174,18 +206,70 @@ function Profile(props) {
 	})
 	.then((json) => {
 	    if (json.success) {
+		let notesVal = json.data.notes || '';
 		setWidget(
 		    <div>
 			<dl>
 			    <dt>Name</dt>
 			    <dd>{json.data.name}</dd>
 			    <dt>Notes</dt>
-			    <dd>{json.data.notes ? json.data.notes : 'None'}</dd>
+			    <dd>
+				<form onSubmit={saveNotes}>
+				    <input type='hidden' name='history_id' value={json.history_id} />
+				    <textarea id='notes'
+					      name='notes'
+					      rows="5"
+					      cols="40"
+					      defaultValue={notesVal}>
+				    </textarea>
+				    <br />
+				    <button type='submit'>Update</button>
+				</form>
+			    </dd>
 			</dl>
 			<p>Exercise data:</p>
 			<JsonView data={json.data.exercises} shouldExpandNode={expandToSecondLevel} style={darkStyles} />
+			<button onClick={() => ConfirmDeleteHistoryItem(json.history_id)}>Delete</button>
 		    </div>
 		);
+	    }
+	    else {
+		setWidget(
+		    <div>
+			<p>Error: {json.error}</p>
+		    </div>
+		);
+	    }
+	});
+    }
+    
+    const ConfirmDeleteHistoryItem = async(history_id) => {
+	setWidget(
+	    <div>
+		<p>Delete history item?</p>
+		<br />
+		<button onClick={() => DeleteHistoryItem(history_id)}>Delete</button>
+		&nbsp;
+		<button onClick={() =>GetHistoryList(0,0)}>Cancel</button>
+	    </div>
+	);
+    }
+    
+    const DeleteHistoryItem = async(history_id) => {
+	fetch('/api/delete_history/' + history_id, {
+	    headers: {
+		'Authorization': 'Bearer ' + props.token,
+	    },
+	})
+	.then((response) => {
+	    if (!response.ok) {
+		throw new Error("HTTP error! Status: ${response.status}");
+	    }
+	    return response.json();
+	})
+	.then((json) => {
+	    if (json.success) {
+		GetHistoryList(0,0);
 	    }
 	    else {
 		setWidget(
@@ -279,6 +363,7 @@ function Profile(props) {
 				    <th>Date</th>
 				    <th>Routine</th>
 				    <th>Details</th>
+				    <th>Delete?</th>
 				</tr>
 			    </thead>
 			    <tbody>
@@ -287,6 +372,7 @@ function Profile(props) {
 					<td>{entry.datetime}</td>
 					<td>{entry.name}</td>
 					<td><button onClick={() => HistoryItem(entry.history_id)}>Details</button></td>
+					<td><button onClick={() => ConfirmDeleteHistoryItem(entry.history_id)}>Delete</button></td>
 				    </tr>
 				))}
 			    </tbody>
