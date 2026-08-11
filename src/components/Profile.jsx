@@ -20,7 +20,8 @@ function Profile(props) {
 	    method: 'POST',
 	})
 	.then((response) => {
-	    props.removeToken()
+	    localStorage.removeItem('token');
+	    window.location.reload();
 	})
 	.catch((error) => {
 	    if (error.response) {
