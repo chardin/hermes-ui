@@ -419,6 +419,20 @@ function Profile(props) {
 	});
     }
 
+    const EditRoutines = async(routines) => {
+	console.log(routines);
+	setWidget(
+	    <div>XXX Not implemented yet XXX</div>
+	);
+    }
+    
+    const EditExercises = async(exercises) => {
+	console.log(exercises);
+	setWidget(
+	    <div>XXX Also not implemented yet XXX</div>
+	);
+    }
+    
     useEffect(() => {
 	fetch('/api/profile', {
 	    headers: {
@@ -460,6 +474,18 @@ function Profile(props) {
 		text: 'History',
 		url: '#',
 		onClick: () => GetHistoryList(0, 0)
+	    },
+	    {
+		text: 'Edit',
+		url: '#',
+		submenu: [
+		    { text: 'Routines',
+		      url: '#',
+		      onClick: () => EditRoutines(data.routines) },
+		    { text: 'Exercises',
+		      url: '#',
+		      onClick: () => EditExercises(data.exercises) },		      
+		]
 	    },
 	]);
     }
