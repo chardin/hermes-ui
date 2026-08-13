@@ -434,25 +434,25 @@ function Profile(props) {
 		onClick: () => Fortune()
 	    },
 	    {
-		title: 'User',
+		text: 'User',
 		url: '#',
 		submenu: [
-		    { title: 'Info', url: '#', onClick: () => DisplayUser(data.user) },
-		    { title: 'Change Password', url: '#', onClick: () => ChangePassForm() },
-		    { title: 'Logout', url: '#', onClick: () => logMeOut() }
+		    { text: 'Info', url: '#', onClick: () => DisplayUser(data.user) },
+		    { text: 'Change Password', url: '#', onClick: () => ChangePassForm() },
+		    { text: 'Logout', url: '#', onClick: () => logMeOut() }
 		]
 	    },
 	    {
-		title: 'Play',
+		text: 'Play',
 		url: '#',
 		submenu: data.routines.map((routine) => (
-		    { title: routine.name,
+		    { text: routine.name,
 		      url: '#',
 		      onClick: () => PlayAudio(routine)
 		    }))
 	    },
 	    {
-		title: 'History',
+		text: 'History',
 		url: '#',
 		onClick: () => GetHistoryList(0, 0)
 	    },

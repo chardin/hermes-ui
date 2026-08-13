@@ -2,11 +2,22 @@ import { useState } from 'react';
 import Dropdown from './Dropdown';
 
 function itemCode(item, dropdown, depthLevel) {
+    let displayElement = '';
+    if (item.img) {
+	displayElement = <img src={item.img} />;
+    }
+    if (item.text) {
+	displayElement = displayElement + item.text;
+    }
+    if (! displayElement) {
+	return <p>XXX</p>;
+    }
+    
     if (item.submenu) {
 	return (
 		<>
 		    <button type="button" aria-haspopup="menu" aria-expanded={dropdown ? "true" : "false"}>
-			{item.title}{' '}
+			{displayElement}{' '}
 			{depthLevel > 0 ? <span>&nbsp;</span> : <span>&raquo;</span>}
 		    </button>
 		    <Dropdown 
@@ -16,23 +27,16 @@ function itemCode(item, dropdown, depthLevel) {
 		    />
 		</>);
     }
-    if (item.img) {
-	return (
-	    <a href={item.url} onClick={item.onClick}><img src={item.img} /></a>
-	);
-    }
-    if (item.text) {
-	return (
-	    <p>{item.text}</p>
-	);
-    }
     if (item.url) {
 	return (
-	    <a href={item.url} onClick={item.onClick}> {item.title} </a>
+	    <a href={item.url} onClick={item.onClick}> {displayElement} </a>
 	);
     }
-
-    console.error(item);
+    else {
+	return (
+	    {displayElement}
+	);
+    }
 }
 
 const MenuItems = ({ items, depthLevel }) => {
