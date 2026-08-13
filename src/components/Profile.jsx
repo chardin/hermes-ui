@@ -282,6 +282,14 @@ function Profile(props) {
 	});
     }
     
+    const About = async() => {
+	setWidget(
+	    <p>Hermes (&#x1F19;&#x3C1;&#x3BC;&#x1FC6;&#x3C2;) is a system for
+	    providing audio guidance for exercise regimens and recording
+	    progress with those regimens.</p>
+	);
+    }
+    
     const Fortune = async() => {
 	fetch('/api/fortune', {
 	    headers: {
@@ -431,14 +439,11 @@ function Profile(props) {
 	    {
 		img: heroImage,
 		url: "#",
-		onClick: () => Fortune()
-	    },
-	    {
-		text: 'User',
-		url: '#',
 		submenu: [
 		    { text: 'Info', url: '#', onClick: () => DisplayUser(data.user) },
 		    { text: 'Change Password', url: '#', onClick: () => ChangePassForm() },
+		    { text: 'Wisdom', url: '#', onClick: () => Fortune() },
+		    { text: 'About', url: '#', onClick: () => About() },
 		    { text: 'Logout', url: '#', onClick: () => logMeOut() }
 		]
 	    },
