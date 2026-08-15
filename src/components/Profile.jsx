@@ -4,6 +4,7 @@ import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import Navbar from './Navbar';
 import heroImage from '../assets/hero-small.png';
+import './Grid.css';
 
 function Profile(props) {
     const [data, setData] = useState([]);
@@ -12,6 +13,7 @@ function Profile(props) {
     const [blobUrl, setBlobUrl] = useState(null);
     const [wakeLock, setWakeLock] = useState(null);
     const [menuData, setMenuData] = useState(null);
+    const [name, setName] = useState('');
     
     const expandToSecondLevel = (level) => level < 2;
 
@@ -32,6 +34,76 @@ function Profile(props) {
 	})
     }
 
+    const ShowRoutines = async(routines) => {
+	routines.sort((a, b) => a.name.localeCompare(b.name));
+	console.log(routines);
+	setWidget(
+	    <div className="flexible-grid-container">
+	    {routines.map((routine) => (
+		<div key={routine.routine_id} className="grid-item">
+		    <a href='#' onClick={() => EditRoutineForm(routine)}>{routine.name}</a>
+		</div>
+	    ))}
+	    </div>
+	);
+    }
+    
+    const ShowExercises = async(exercises) => {
+	exercises.sort((a, b) => a.name.localeCompare(b.name));
+	console.log(exercises);
+	setWidget(
+	    <div className="flexible-grid-container">
+	    {exercises.map((exercise) => (
+		<div key={exercise.exercise_id} className="grid-item">
+		    <a href='#' onClick={() => EditExercise(exercise)}>{exercise.name}</a>
+		</div>
+	    ))}
+	    </div>
+	);
+    }
+
+    const EditRoutineForm = async(routine) => {
+	setWidget(
+	    <div className="form-group">
+		<form id="EditRoutine" onSubmit={SaveRoutine}>
+		    <input
+			type='hidden'
+			name='routine_id'
+			defaultValue={routine.routine_id}
+		    />
+		    <label htmlFor="name">Name:</label>
+		    <input
+			name='name'
+			id='name'
+			type='text'
+			defaultValue={routine.name}
+			required
+		    />
+		    
+		    <br />
+		    <button type="submit">Save Routine</button>
+		</form>
+	    </div>
+	);
+    }
+
+    const SaveRoutine = async() => {
+	event.preventDefault();
+	const form = event.target;
+	const formData = new FormData(form);
+	const formValues = Object.fromEntries(formData.entries());
+
+	console.log(formValues);
+    }
+    
+    const EditExercise = async(exercise) => {
+	setWidget(
+	    <div>
+		<p>Edit {exercise.name}</p>
+	    </div>
+	);
+    }
+    
     const DisplayUser = async(user_data) => {
 	setWidget(
 	    <div>
@@ -464,7 +536,7 @@ function Profile(props) {
 	    {
 		text: 'Play',
 		url: '#',
-		submenu: data.routines.map((routine) => (
+		submenu: data.routines.sort((a, b) => a.name.localeCompare(b.name)).map((routine) => (
 		    { text: routine.name,
 		      url: '#',
 		      onClick: () => PlayAudio(routine)
@@ -476,15 +548,15 @@ function Profile(props) {
 		onClick: () => GetHistoryList(0, 0)
 	    },
 	    {
-		text: 'Edit',
+		text: 'Edit XXX',
 		url: '#',
 		submenu: [
 		    { text: 'Routines',
 		      url: '#',
-		      onClick: () => EditRoutines(data.routines) },
+		      onClick: () => ShowRoutines(data.routines), },
 		    { text: 'Exercises',
 		      url: '#',
-		      onClick: () => EditExercises(data.exercises) },		      
+		      onClick: () => ShowExercises(data.exercises), },
 		]
 	    },
 	]);
