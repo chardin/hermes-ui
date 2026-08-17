@@ -28,6 +28,11 @@ function itemCode(item, dropdown, depthLevel) {
 		</>);
     }
     if (item.url) {
+	if (item.newWindow) {
+	    return (
+		<a href={item.url} onClick={item.onClick} target="_blank" rel="noopener noreferrer"> {displayElement} </a>
+	    );
+	}
 	return (
 	    <a href={item.url} onClick={item.onClick}> {displayElement} </a>
 	);

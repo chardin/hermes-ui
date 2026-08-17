@@ -543,6 +543,7 @@ function Profile(props) {
 		    { text: 'Change Password', url: '#', onClick: () => ChangePassForm() },
 		    { text: 'Wisdom', url: '#', onClick: () => Fortune() },
 		    { text: 'About', url: '#', onClick: () => About() },
+		    { text: 'Report An Issue', url: 'https://github.com/chardin/hermes-ui/issues/new', newWindow: true},
 		    { text: 'Logout', url: '#', onClick: () => logMeOut() }
 		]
 	    },
