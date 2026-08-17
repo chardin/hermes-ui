@@ -36,7 +36,6 @@ function Profile(props) {
 
     const ShowRoutines = async(routines) => {
 	routines.sort((a, b) => a.name.localeCompare(b.name));
-	console.log(routines);
 	setWidget(
 	    <div className="flexible-grid-container">
 	    {routines.map((routine) => (
@@ -50,7 +49,6 @@ function Profile(props) {
     
     const ShowExercises = async(exercises) => {
 	exercises.sort((a, b) => a.name.localeCompare(b.name));
-	console.log(exercises);
 	setWidget(
 	    <div className="flexible-grid-container">
 	    {exercises.map((exercise) => (
@@ -79,6 +77,19 @@ function Profile(props) {
 			defaultValue={routine.name}
 			required
 		    />
+		    <br />
+		    {routine.exercises.map((exercise) => (
+			<>
+			    <label htmlFor='exercise_name'>{exercise.name}</label>
+			    <input
+			    type='text'
+				name='order'
+				defaultValue={exercise.order}
+			    />
+			    <br />
+			</>
+
+		    ))}
 		    
 		    <br />
 		    <button type="submit">Save Routine</button>
@@ -285,6 +296,8 @@ function Profile(props) {
 			<dl>
 			    <dt>Name</dt>
 			    <dd>{json.data.name}</dd>
+			    <dt>Date and time</dt>
+			    <dd>{json.data.exercise_dt}</dd>
 			    <dt>Notes</dt>
 			    <dd>
 				<form onSubmit={saveNotes}>
@@ -420,7 +433,7 @@ function Profile(props) {
 		    <div>
 			<h1 style={{ textAlign: 'center', color: '#EDE8E4' }}>{routine.name}</h1>
 			<audio controls src={blobUrl} onPlay={requestWakeLock} onEnded={() => RecordHistory(routine.routine_id)} />
-			<h2 style={{ textAlign: 'center', color: '#EDE8E4' }}>or <a href={blobUrl} download={routineFilename} type="audio/mpeg">download the audio</a></h2>
+			<h2 style={{ textAlign: 'center', color: '#EDE8E4' }}>or <a href={blobUrl} download={routineFilename} type="audio/mpeg" style={{ color: '#83CEEC' }}>download the audio</a></h2>
 		    </div>
 		);
 	    }
