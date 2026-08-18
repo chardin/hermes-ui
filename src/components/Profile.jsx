@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom';
-import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
-import 'react-json-view-lite/dist/index.css';
 import Navbar from './Navbar';
+import { RecordHistory, HistoryItem, ConfirmDeleteHistoryItem, GetHistoryList, PlayAudio } from './History';
+import { ChangePassForm } from './Password';
 import heroImage from '../assets/hero-small.png';
 import './Grid.css';
 
@@ -10,13 +10,11 @@ function Profile(props) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [widget, setWidget] = useState(false);
-    const [blobUrl, setBlobUrl] = useState(null);
     const [wakeLock, setWakeLock] = useState(null);
     const [menuData, setMenuData] = useState(null);
     const [name, setName] = useState('');
+    const [blobUrl, setBlobUrl] = useState(null);
     
-    const expandToSecondLevel = (level) => level < 2;
-
     const logMeOut = async() => {
 	fetch('/api/invalidate', {
 	    method: 'POST',
@@ -138,235 +136,6 @@ function Profile(props) {
 	);
     }
 
-    const ChangePassForm = async() => {
-	setWidget(
-	    <div>
-		<form id="ChangePass" onSubmit={ChangePass}>
-		    <label>Current Password:</label>
-		    <input
-			type="password"
-			id="current_password"
-			name="current_password"
-			required></input>
-		    <br />
-		    <label>New Password:</label>
-		    <input
-			type="password"
-			id="new_password"
-			name="new_password"
-			required></input>
-		    <br />
-		    <label>Confirm New Password:</label>
-		    <input
-			type="password"
-			id="confirm_password"
-			name="confirm_password"
-			required></input>
-		    <br />
-		    <button type="submit">Update Password</button>
-		</form>
-	    </div>
-	);
-    }
-
-    const ChangePass = async() => {
-	event.preventDefault();
-	const form = event.target;
-	const formData = new FormData(form);
-
-	const formValues = Object.fromEntries(formData.entries());
-	
-    	fetch('/api/change_password', {
-	    method: 'POST',	    
-	    headers: {
-		'Authorization': 'Bearer ' + props.token,
-		'Content-Type': 'application/json',
-		'Accept': 'application/json',
-	    },
-	    body: JSON.stringify(formValues),
-	})
-	.then((response) => {
-	    if (!response.ok) {
-		throw new Error("HTTP error! Status: ${response.status}");
-	    }
-	    return response.json();
-	})
-	.then((json) => {
-	    if (json.success) {
-		setWidget(
-		    <p>Password changed!</p>
-		);
-	    }
-	    else {
-		setWidget(
-		    <p>Error: {json.error}</p>
-		);
-	    }
-	});
-    }
-    
-    const requestWakeLock = async () => {
-	if (!('wakeLock' in navigator)) {
-	    alert('Wake Lock API is not supported.');
-	    return;
-	}
-	try {
-	    const lock = await navigator.wakeLock.request('screen');
-	    setWakeLock(lock);
-	} catch (err) {
-	    console.error(`${err.name}, ${err.message}`);
-	}
-    };
-
-    const saveNotes = (e) => {
-	e.preventDefault();
-	const form = event.target;
-	const formData = new FormData(form);
-	const formValues = Object.fromEntries(formData.entries());
-
-    	fetch('/api/save_notes', {
-	    method: 'POST',	    
-	    headers: {
-		'Authorization': 'Bearer ' + props.token,
-		'Content-Type': 'application/json',
-		'Accept': 'application/json',
-	    },
-	    body: JSON.stringify(formValues),
-	})
-	.then((response) => {
-	    if (!response.ok) {
-		throw new Error("HTTP error! Status: ${response.status}");
-	    }
-	    return response.json();
-	})
-	.then((json) => {
-	    if (json.success) {
-		HistoryItem(formValues.history_id);
-	    }
-	    else {
-		setWidget(
-		    <p>Error: {json.error}</p>
-		);
-	    }
-	});    
-
-    };
-    
-    const RecordHistory = async(routine_id) => {
-	fetch('/api/record_history/' + routine_id, {
-	    headers: {
-		'Authorization': 'Bearer ' + props.token,
-	    },
-	})
-	.then((response) => {
-	    if (!response.ok) {
-		throw new Error("HTTP error! Status: ${response.status}");
-	    }
-	    return response.json();
-	})
-	.then((json) => {
-	    if (json.success) {
-		HistoryItem(json.history_id);
-	    }
-	    else {
-		setWidget(
-		    <p>Error: {json.error}</p>
-		);
-	    }
-	});
-    }
-
-    const HistoryItem = async(history_id) => {
-	fetch('/api/history_detail/' + history_id, {
-	    headers: {
-		'Authorization': 'Bearer ' + props.token,
-	    },
-	})
-	.then((response) => {
-	    if (!response.ok) {
-		throw new Error("HTTP error! Status: ${response.status}");
-	    }
-	    return response.json();
-	})
-	.then((json) => {
-	    if (json.success) {
-		let notesVal = json.data.notes || '';
-		setWidget(
-		    <div>
-			<dl>
-			    <dt>Name</dt>
-			    <dd>{json.data.name}</dd>
-			    <dt>Date and time</dt>
-			    <dd>{json.data.exercise_dt}</dd>
-			    <dt>Notes</dt>
-			    <dd>
-				<form onSubmit={saveNotes}>
-				    <input type='hidden' name='history_id' value={json.history_id} />
-				    <textarea id='notes'
-					      name='notes'
-					      rows="5"
-					      cols="40"
-					      defaultValue={notesVal}>
-				    </textarea>
-				    <br />
-				    <button type='submit'>Update</button>
-				</form>
-			    </dd>
-			</dl>
-			<p>Exercise data:</p>
-			<JsonView data={json.data.exercises} shouldExpandNode={expandToSecondLevel} style={darkStyles} />
-			<button onClick={() => ConfirmDeleteHistoryItem(json.history_id)}>Delete</button>
-		    </div>
-		);
-	    }
-	    else {
-		setWidget(
-		    <div>
-			<p>Error: {json.error}</p>
-		    </div>
-		);
-	    }
-	});
-    }
-    
-    const ConfirmDeleteHistoryItem = async(history_id) => {
-	setWidget(
-	    <div>
-		<p>Delete history item?</p>
-		<br />
-		<button onClick={() => DeleteHistoryItem(history_id)}>Delete</button>
-		&nbsp;
-		<button onClick={() =>GetHistoryList(0,0)}>Cancel</button>
-	    </div>
-	);
-    }
-    
-    const DeleteHistoryItem = async(history_id) => {
-	fetch('/api/delete_history/' + history_id, {
-	    headers: {
-		'Authorization': 'Bearer ' + props.token,
-	    },
-	})
-	.then((response) => {
-	    if (!response.ok) {
-		throw new Error("HTTP error! Status: ${response.status}");
-	    }
-	    return response.json();
-	})
-	.then((json) => {
-	    if (json.success) {
-		GetHistoryList(0,0);
-	    }
-	    else {
-		setWidget(
-		    <div>
-			<p>Error: {json.error}</p>
-		    </div>
-		);
-	    }
-	});
-    }
-    
     const About = async() => {
 	setWidget(
 	    <p>Hermes (&#x1F19;&#x3C1;&#x3BC;&#x1FC6;&#x3C2;) is a system for
@@ -392,105 +161,6 @@ function Profile(props) {
 		setWidget(
 		    <div>
 			<pre style={{fontSize: '14px'}}>{json.fortune}</pre>
-		    </div>
-		);
-	    }
-	    else {
-		setWidget(
-		    <div>
-			<p>Error: {json.error}</p>
-		    </div>
-		);
-	    }
-	});
-    }
-
-    function PlayAudio(routine){
-	setWidget(
-	    <div>
-		<p>Fetching...</p>
-	    </div>
-	);
-	fetch(routine.audio_path, {
-	    headers: {
-		'Authorization': 'Bearer ' + props.token,
-	    },
-	})
-	.then((response) => {
-	    if (!response.ok) {
-		throw new Error("HTTP error! Status: ${response.status}");
-	    }
-	    return response.blob();
-	})
-	.then((audioBlob) => {
-	    return URL.createObjectURL(audioBlob);	
-	})
-	.then((blobUrl) => {
-	    setBlobUrl(blobUrl);
-	    if (blobUrl) {
-		let routineFilename = routine.name + '.mp3';
-		setWidget(
-		    <div>
-			<h1 style={{ textAlign: 'center', color: '#EDE8E4' }}>{routine.name}</h1>
-			<audio controls src={blobUrl} onPlay={requestWakeLock} onEnded={() => RecordHistory(routine.routine_id)} />
-			<h2 style={{ textAlign: 'center', color: '#EDE8E4' }}>or <a href={blobUrl} download={routineFilename} type="audio/mpeg" style={{ color: '#83CEEC' }}>download the audio</a></h2>
-		    </div>
-		);
-	    }
-	});
-    };
-
-    const GetHistoryList = async(page_num, num_rows) => {
-	fetch('/api/routine_history/' + page_num + '/' + num_rows, {
-	    headers: {
-		'Authorization': 'Bearer ' + props.token,
-	    },
-	})
-	.then((response) => response.json())
-	.then((json) => {
-	    if (json.success) {
-		setWidget(
-		    <div>
-			<table style={{ width: '100%'}}>
-			    <thead>
-				<tr>
-				    <th>Date</th>
-				    <th>Routine</th>
-				    <th>Details</th>
-				    <th>Delete?</th>
-				</tr>
-			    </thead>
-			    <tbody>
-				{json.history.map((entry) => (
-				    <tr key={entry.history_id}>
-					<td>{entry.datetime}</td>
-					<td>{entry.name}</td>
-					<td><button onClick={() => HistoryItem(entry.history_id)}>Details</button></td>
-					<td><button onClick={() => ConfirmDeleteHistoryItem(entry.history_id)}>Delete</button></td>
-				    </tr>
-				))}
-			    </tbody>
-			    <tfoot>
-				<tr>
-				    <th>
-					{page_num > 0 ? (
-					    <div><button onClick={() => GetHistoryList(page_num - 1, num_rows)}>&larr;</button></div>
-					) : (
-					    ' ')
-					}
-				    </th>
-				    <th>&nbsp;</th>
-				    <th>
-					{json.next_page ? (
-					    <div><button onClick={() => GetHistoryList(page_num + 1, num_rows)}>&rarr;</button></div>
-					) : (
-					    ' '
-					)}
-				    </th>
-				</tr>
-			    </tfoot>
-			</table>
-			
 		    </div>
 		);
 	    }
@@ -540,7 +210,7 @@ function Profile(props) {
 		url: "#",
 		submenu: [
 		    { text: 'Info', url: '#', onClick: () => DisplayUser(data.user) },
-		    { text: 'Change Password', url: '#', onClick: () => ChangePassForm() },
+		    { text: 'Change Password', url: '#', onClick: () => ChangePassForm(setWidget, props) },
 		    { text: 'Wisdom', url: '#', onClick: () => Fortune() },
 		    { text: 'About', url: '#', onClick: () => About() },
 		    { text: 'Report An Issue', url: 'https://github.com/chardin/hermes-ui/issues/new', newWindow: true},
@@ -553,13 +223,13 @@ function Profile(props) {
 		submenu: data.routines.sort((a, b) => a.name.localeCompare(b.name)).map((routine) => (
 		    { text: routine.name,
 		      url: '#',
-		      onClick: () => PlayAudio(routine)
+		      onClick: () => PlayAudio(setWidget, setBlobUrl, setWakeLock, props, routine)
 		    }))
 	    },
 	    {
 		text: 'History',
 		url: '#',
-		onClick: () => GetHistoryList(0, 0)
+		onClick: () => GetHistoryList(setWidget, props, 0, 0)
 	    },
 	    {
 		text: 'Edit XXX',
