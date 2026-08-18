@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import { RecordHistory, HistoryItem, ConfirmDeleteHistoryItem, GetHistoryList, PlayAudio } from './History';
 import { ChangePassForm } from './Password';
 import { DisplayUser, About, Fortune} from './UserMenu';
+import { ShowRoutines, ShowExercises } from './Editor';
 import heroImage from '../assets/hero-small.png';
 import './Grid.css';
 
@@ -33,101 +34,6 @@ function Profile(props) {
 	})
     }
 
-    const ShowRoutines = async(routines) => {
-	routines.sort((a, b) => a.name.localeCompare(b.name));
-	setWidget(
-	    <div className="flexible-grid-container">
-	    {routines.map((routine) => (
-		<div key={routine.routine_id} className="grid-item">
-		    <a href='#' onClick={() => EditRoutineForm(routine)}>{routine.name}</a>
-		</div>
-	    ))}
-	    </div>
-	);
-    }
-    
-    const ShowExercises = async(exercises) => {
-	exercises.sort((a, b) => a.name.localeCompare(b.name));
-	setWidget(
-	    <div className="flexible-grid-container">
-	    {exercises.map((exercise) => (
-		<div key={exercise.exercise_id} className="grid-item">
-		    <a href='#' onClick={() => EditExercise(exercise)}>{exercise.name}</a>
-		</div>
-	    ))}
-	    </div>
-	);
-    }
-
-    const EditRoutineForm = async(routine) => {
-	setWidget(
-	    <div className="form-group">
-		<form id="EditRoutine" onSubmit={SaveRoutine}>
-		    <input
-			type='hidden'
-			name='routine_id'
-			defaultValue={routine.routine_id}
-		    />
-		    <label htmlFor="name">Name:</label>
-		    <input
-			name='name'
-			id='name'
-			type='text'
-			defaultValue={routine.name}
-			required
-		    />
-		    <br />
-		    {routine.exercises.map((exercise) => (
-			<>
-			    <label htmlFor='exercise_name'>{exercise.name}</label>
-			    <input
-			    type='text'
-				name='order'
-				defaultValue={exercise.order}
-			    />
-			    <br />
-			</>
-
-		    ))}
-		    
-		    <br />
-		    <button type="submit">Save Routine</button>
-		</form>
-	    </div>
-	);
-    }
-
-    const SaveRoutine = async() => {
-	event.preventDefault();
-	const form = event.target;
-	const formData = new FormData(form);
-	const formValues = Object.fromEntries(formData.entries());
-
-	console.log(formValues);
-    }
-    
-    const EditExercise = async(exercise) => {
-	setWidget(
-	    <div>
-		<p>Edit {exercise.name}</p>
-	    </div>
-	);
-    }
-    
-    const EditRoutines = async(routines) => {
-	console.log(routines);
-	setWidget(
-	    <div>XXX Not implemented yet XXX</div>
-	);
-    }
-    
-    const EditExercises = async(exercises) => {
-	console.log(exercises);
-	setWidget(
-	    <div>XXX Also not implemented yet XXX</div>
-	);
-    }
-    
     useEffect(() => {
 	fetch('/api/profile', {
 	    headers: {
@@ -177,10 +83,10 @@ function Profile(props) {
 		submenu: [
 		    { text: 'Routines',
 		      url: '#',
-		      onClick: () => ShowRoutines(data.routines), },
+		      onClick: () => ShowRoutines(setWidget, props, data.routines), },
 		    { text: 'Exercises',
 		      url: '#',
-		      onClick: () => ShowExercises(data.exercises), },
+		      onClick: () => ShowExercises(setWidget, props, data.exercises), },
 		]
 	    },
 	]);
