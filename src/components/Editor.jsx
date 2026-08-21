@@ -46,6 +46,13 @@ export function EditRoutineForm(setWidget, props, routine) {
 		<br />
 		<h3>Exercises:</h3>
 		<table>
+		    <colgroup>
+			<col style={{width: 'auto'}} />
+			<col style={{width: '150px'}} />
+			<col style={{width: '150px'}} />
+			<col style={{width: '150px'}} />
+			<col style={{width: '150px'}} />
+		    </colgroup>
 		    <thead>
 			<tr>
 			    <th>Name</th>
@@ -58,29 +65,23 @@ export function EditRoutineForm(setWidget, props, routine) {
 		    <tbody>
 		{routine.exercises.map((exercise) => (
 		    <tr key={'exercise-'+exercise.exercise_id}>
-			    <td>
-				<input
-				    name={'name-'+exercise.exercise_id}
-				    id={'name-'+exercise.exercise_id}
-				    key={'name-'+exercise.exercise_id}
-				    type='text'
-				    defaultValue={exercise.name}
-				/>
-			    </td>
-			    {IntegerWidget('order', exercise.exercise_id, exercise.order)}
-			    {IntegerWidget('num_sets', exercise.exercise_id, exercise.num_sets)}
-			    {IntegerWidget('num_reps', exercise.exercise_id, exercise.num_reps)}
-			    <td>
-				<input
-				    name={'is_paused-' + exercise.exercise_id}
-				    id={'is_paused-' + exercise.exercise_id}
-				    key={'is_paused-' + exercise.exercise_id}
-				    type='checkbox'
-				    defaultChecked={exercise.is_paused}				    
-				/>
-			    </td>
-			</tr>
-		    
+			<td>
+			    <p>{exercise.name}</p>
+			</td>
+			{IntegerWidget('order', exercise.exercise_id, exercise.order)}
+			{IntegerWidget('num_sets', exercise.exercise_id, exercise.num_sets)}
+			{IntegerWidget('num_reps', exercise.exercise_id, exercise.num_reps)}
+			<td>
+			    <input
+				name={'is_paused-' + exercise.exercise_id}
+				id={'is_paused-' + exercise.exercise_id}
+				key={'is_paused-' + exercise.exercise_id}
+				type='checkbox'
+				value='selected'
+				defaultChecked={exercise.is_paused}				    
+			    />
+			</td>
+		    </tr>
 		))}
 		    </tbody>
 		</table>			
@@ -91,13 +92,14 @@ export function EditRoutineForm(setWidget, props, routine) {
 }
 
 function IntegerWidget(baseName, id, defaultValue) {
+    let elementName = baseName + '-' + id;
     return (
 	<td>
-	    <button>-</button>
+	    <button onClick={(e) => decrementInteger(e, elementName)}>-</button>
 	    <input
-		name={baseName + '-' + id}
-		id={baseName + '-' + id}
-		key={baseName + '-' + id}
+		name={elementName}
+		id={elementName}
+		key={elementName}
 		size="2"
 		type='text'
 		defaultValue={defaultValue}
@@ -106,7 +108,11 @@ function IntegerWidget(baseName, id, defaultValue) {
 	    <button>+</button>
 	</td>
     );
-}	
+}
+
+function decrementInteger(event, elementName) {
+    console.log(elementName);
+}
 
 export function SaveRoutine(event, setWidget, props) {
     event.preventDefault();
@@ -115,6 +121,46 @@ export function SaveRoutine(event, setWidget, props) {
     const formValues = Object.fromEntries(formData.entries());
     
     console.log(formValues);
+    
+    fetch('/api/save_routine', {
+	method: 'POST',	    
+	headers: {
+	    'Authorization': 'Bearer ' + props.token,
+	    'Content-Type': 'application/json',
+	    'Accept': 'application/json',
+	},
+	body: JSON.stringify(formValues),
+    })
+    .then((response) => {
+	if (!response.ok) {
+	    setWidget(
+		<div>
+		    <p><b>Error:</b> Status code {response.status}: {response.statusText || 'No further message'}</p>
+		</div>
+	    );
+	}
+	return response.json();
+    })
+    .then((json) => {
+	if (json.success) {
+	    if (json.updated) {
+		setWidget(
+		    <p>Routine saved!</p>
+		);
+	    }
+	    else {
+		setWidget(
+		    <p>Nothing to update!</p>
+		);
+	    }
+	}
+	else {
+	    setWidget(
+		<p>Error: {json.error}</p>
+	    );
+	}
+    });
+    
 }
     
 export function EditExercise(setWidget, props, exercise) {

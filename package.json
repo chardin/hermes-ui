@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start-backend": "cd $HERMES_SRC_DIR && /usr/bin/env flask run --no-debugger --debug --host=0.0.0.0"
+    "start-backend": "cd $HERMES_SRC_DIR && /usr/bin/env flask run --debugger --debug --host=0.0.0.0"
   },
   "dependencies": {
     "@mui/icons-material": "^9.2.0",
