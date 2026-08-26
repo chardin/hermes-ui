@@ -27,7 +27,7 @@ export function ShowExercises(setWidget, props, exercises) {
 export function EditRoutineForm(setWidget, props, routine) {
     setWidget(
 	<div className="form-group">
-	    <form id="EditRoutine" onSubmit={(e) => SaveRoutine(e, setWidget, props)}>
+	    <form id="EditRoutine" onSubmit={(e) => SaveRoutine(e, setWidget, props, routine)}>
 		<input
 		    type='hidden'
 		    name='routine_id'
@@ -95,7 +95,6 @@ function IntegerWidget(baseName, id, defaultValue) {
     let elementName = baseName + '-' + id;
     return (
 	<td>
-	    <button onClick={(e) => decrementInteger(e, elementName)}>-</button>
 	    <input
 		name={elementName}
 		id={elementName}
@@ -105,7 +104,6 @@ function IntegerWidget(baseName, id, defaultValue) {
 		defaultValue={defaultValue}
 		required
 	    />
-	    <button>+</button>
 	</td>
     );
 }
@@ -114,7 +112,7 @@ function decrementInteger(event, elementName) {
     console.log(elementName);
 }
 
-export function SaveRoutine(event, setWidget, props) {
+export function SaveRoutine(event, setWidget, props, routine) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
@@ -145,7 +143,7 @@ export function SaveRoutine(event, setWidget, props) {
 	if (json.success) {
 	    if (json.updated) {
 		setWidget(
-		    <p>Routine saved!</p>
+		    <p>Routine updated!</p>
 		);
 	    }
 	    else {
