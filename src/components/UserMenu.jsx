@@ -1,22 +1,24 @@
-export function DisplayUser(pseudoGlobal, user_data) {
+export function DisplayUser(pseudoGlobal) {
     const setPanel = pseudoGlobal.setPanel;
+    const profileData = pseudoGlobal.profileData;
+    
     setPanel(
 	<div>
 	    <dl>
 		<dt>Username</dt>
-		<dd>{user_data.username}</dd>
+		<dd>{profileData.username}</dd>
 	    </dl>
 	    <dl>
 		<dt>Full Name</dt>
-		<dd>{user_data.full_name}</dd>		
+		<dd>{profileData.full_name}</dd>		
 	    </dl>
 	    <dl>
 		<dt>Admin?</dt>
-		<dd>{user_data.is_admin ? 'Yes' : 'No'}</dd>		
+		<dd>{profileData.is_admin ? 'Yes' : 'No'}</dd>		
 	    </dl>
 	    <dl>
 		<dt>Timezone</dt>
-		<dd>{user_data.timezone}</dd>		
+		<dd>{profileData.timezone}</dd>		
 	    </dl>
 	</div>
     );

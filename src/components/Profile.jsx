@@ -9,7 +9,7 @@ import heroImage from '../assets/hero-small.png';
 import './Grid.css';
 
 function Profile(props) {
-    const [data, setData] = useState([]);
+    const [profileData, setProfileData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [panel, setPanel] = useState(false);
     const [wakeLock, setWakeLock] = useState(null);
@@ -19,7 +19,8 @@ function Profile(props) {
 
     let pseudoGlobal = {'props': props,
 			'setPanel': setPanel,
-			'setData': setData};
+			'profileData': profileData,
+			'setProfileData': setProfileData};
     
     const logMeOut = async() => {
 	fetch('/api/invalidate', {
@@ -46,10 +47,10 @@ function Profile(props) {
 	})
         .then((response) => response.json())
 	.then((json) => {
-	    setData(json);
+	    setProfileData(json);
 	    setLoading(false);}
 	)
-	.catch((error) => console.error('Error fetching data:', error));
+	.catch((error) => console.error('Error fetching profile data:', error));
 	setMenuData(false);
     }, []);
     if (loading) return <p>Loading...</p>;
@@ -59,7 +60,7 @@ function Profile(props) {
 		img: heroImage,
 		url: "#",
 		submenu: [
-		    { text: 'Info', url: '#', onClick: () => DisplayUser(pseudoGlobal, data.user) },
+		    { text: 'Info', url: '#', onClick: () => DisplayUser(pseudoGlobal) },
 		    { text: 'Change Password', url: '#', onClick: () => ChangePassForm(pseudoGlobal) },
 		    { text: 'Wisdom', url: '#', onClick: () => Fortune(pseudoGlobal) },
 		    { text: 'About', url: '#', onClick: () => About(pseudoGlobal) },
@@ -70,7 +71,7 @@ function Profile(props) {
 	    {
 		text: 'Play',
 		url: '#',
-		submenu: data.routines.sort((a, b) => a.name.localeCompare(b.name)).map((routine) => (
+		submenu: profileData.routines.sort((a, b) => a.name.localeCompare(b.name)).map((routine) => (
 		    { text: routine.name,
 		      url: '#',
 		      onClick: () => PlayAudio(pseudoGlobal, setBlobUrl, setWakeLock, routine)
@@ -87,10 +88,10 @@ function Profile(props) {
 		submenu: [
 		    { text: 'Routines',
 		      url: '#',
-		      onClick: () => ShowRoutines(pseudoGlobal, data.routines), },
+		      onClick: () => ShowRoutines(pseudoGlobal, profileData.routines), },
 		    { text: 'Exercises',
 		      url: '#',
-		      onClick: () => ShowExercises(pseudoGlobal, data.exercises), },
+		      onClick: () => ShowExercises(pseudoGlobal, profileData.exercises), },
 		]
 	    },
 	]);

@@ -1,6 +1,7 @@
-export function ShowRoutines(pseudoGlobal, routines) {
+export function ShowRoutines(pseudoGlobal) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
+    const routines = pseudoGlobal.profileData.routines;
     
     routines.sort((a, b) => a.name.localeCompare(b.name));
     setPanel(
@@ -14,9 +15,10 @@ export function ShowRoutines(pseudoGlobal, routines) {
     );
 }
     
-export function ShowExercises(pseudoGlobal, exercises) {
+export function ShowExercises(pseudoGlobal) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
+    const exercises = pseudoGlobal.profileData.exercises;
 
     exercises.sort((a, b) => a.name.localeCompare(b.name));
     setPanel(
@@ -183,9 +185,10 @@ function EditExercise(pseudoGlobal, exercise) {
     );
 }
     
-function EditRoutines(pseudoGlobal, routines) {
+function EditRoutines(pseudoGlobal) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
+    const routines = pseudoGlobal.profileData.routines;
 
     console.log(routines);
     setPanel(
@@ -193,9 +196,10 @@ function EditRoutines(pseudoGlobal, routines) {
     );
 }
     
-function EditExercises(pseudoGlobal, exercises) {
+function EditExercises(pseudoGlobal) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
+    const exercises = pseudoGlobal.profileData.exercises;
 
     console.log(exercises);
     setPanel(
