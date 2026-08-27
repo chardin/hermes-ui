@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
-import { RecordHistory, HistoryItem, ConfirmDeleteHistoryItem, GetHistoryList, PlayAudio } from './History';
+import { HistoryItem, GetHistoryList, PlayAudio } from './History';
 import { ChangePassForm } from './Password';
 import { DisplayUser, About, Fortune} from './UserMenu';
 import { ShowRoutines, ShowExercises } from './Editor';
@@ -11,11 +11,15 @@ import './Grid.css';
 function Profile(props) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [widget, setWidget] = useState(false);
+    const [panel, setPanel] = useState(false);
     const [wakeLock, setWakeLock] = useState(null);
     const [menuData, setMenuData] = useState(null);
     const [name, setName] = useState('');
     const [blobUrl, setBlobUrl] = useState(null);
+
+    let pseudoGlobal = {'props': props,
+			'setPanel': setPanel,
+			'setData': setData};
     
     const logMeOut = async() => {
 	fetch('/api/invalidate', {
@@ -55,10 +59,10 @@ function Profile(props) {
 		img: heroImage,
 		url: "#",
 		submenu: [
-		    { text: 'Info', url: '#', onClick: () => DisplayUser(setWidget, data.user) },
-		    { text: 'Change Password', url: '#', onClick: () => ChangePassForm(setWidget, props) },
-		    { text: 'Wisdom', url: '#', onClick: () => Fortune(setWidget, props) },
-		    { text: 'About', url: '#', onClick: () => About(setWidget, props) },
+		    { text: 'Info', url: '#', onClick: () => DisplayUser(pseudoGlobal, data.user) },
+		    { text: 'Change Password', url: '#', onClick: () => ChangePassForm(pseudoGlobal) },
+		    { text: 'Wisdom', url: '#', onClick: () => Fortune(pseudoGlobal) },
+		    { text: 'About', url: '#', onClick: () => About(pseudoGlobal) },
 		    { text: 'Report An Issue', url: 'https://github.com/chardin/hermes-ui/issues/new', newWindow: true},
 		    { text: 'Logout', url: '#', onClick: () => logMeOut() }
 		]
@@ -69,13 +73,13 @@ function Profile(props) {
 		submenu: data.routines.sort((a, b) => a.name.localeCompare(b.name)).map((routine) => (
 		    { text: routine.name,
 		      url: '#',
-		      onClick: () => PlayAudio(setWidget, setBlobUrl, setWakeLock, props, routine)
+		      onClick: () => PlayAudio(pseudoGlobal, setBlobUrl, setWakeLock, routine)
 		    }))
 	    },
 	    {
 		text: 'History',
 		url: '#',
-		onClick: () => GetHistoryList(setWidget, props, 0, 0)
+		onClick: () => GetHistoryList(pseudoGlobal, 0, 0)
 	    },
 	    {
 		text: 'Edit XXX',
@@ -83,10 +87,10 @@ function Profile(props) {
 		submenu: [
 		    { text: 'Routines',
 		      url: '#',
-		      onClick: () => ShowRoutines(setWidget, props, data.routines), },
+		      onClick: () => ShowRoutines(pseudoGlobal, data.routines), },
 		    { text: 'Exercises',
 		      url: '#',
-		      onClick: () => ShowExercises(setWidget, props, data.exercises), },
+		      onClick: () => ShowExercises(pseudoGlobal, data.exercises), },
 		]
 	    },
 	]);
@@ -99,7 +103,7 @@ function Profile(props) {
 		<br />
 		<main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'block' }}>
 		    <div>
-			{widget ? widget : ''}
+			{panel ? panel : ''}
 		    </div>
 		</main>
 	    </div>

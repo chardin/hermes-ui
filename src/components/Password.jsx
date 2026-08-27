@@ -1,7 +1,9 @@
-export function ChangePassForm(setWidget, props) {
-    setWidget(
+export function ChangePassForm(pseudoGlobal) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+    setPanel(
 	<div>
-	    <form id="ChangePass" onSubmit={(e) => ChangePass(e, setWidget, props)}>
+	    <form id="ChangePass" onSubmit={(e) => ChangePass(e, pseudoGlobal)}>
 		<label>Current Password:</label>
 		<input
 		    type="password"
@@ -29,8 +31,10 @@ export function ChangePassForm(setWidget, props) {
     );
 }
 
-function ChangePass(event, setWidget, props) {
+function ChangePass(event, pseudoGlobal) {
     event.preventDefault();
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
     const form = event.target;
     const formData = new FormData(form);
 
@@ -53,12 +57,12 @@ function ChangePass(event, setWidget, props) {
     })
     .then((json) => {
 	if (json.success) {
-	    setWidget(
+	    setPanel(
 		<p>Password changed!</p>
 	    );
 	}
 	else {
-	    setWidget(
+	    setPanel(
 		<p>Error: {json.error}</p>
 	    );
 	}

@@ -1,33 +1,42 @@
-export function ShowRoutines(setWidget, props, routines) {
+export function ShowRoutines(pseudoGlobal, routines) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+    
     routines.sort((a, b) => a.name.localeCompare(b.name));
-    setWidget(
+    setPanel(
 	<div className="flexible-grid-container">
 	    {routines.map((routine) => (
 		<div key={routine.routine_id} className="grid-item">
-		    <a href='#' key={'link'+routine.routine_id} onClick={() => EditRoutineForm(setWidget, props, routine)}>{routine.name}</a>
+		    <a href='#' key={'link'+routine.routine_id} onClick={() => EditRoutineForm(pseudoGlobal, routine)}>{routine.name}</a>
 		</div>
 	    ))}
 	</div>
     );
 }
     
-export function ShowExercises(setWidget, props, exercises) {
+export function ShowExercises(pseudoGlobal, exercises) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+
     exercises.sort((a, b) => a.name.localeCompare(b.name));
-    setWidget(
+    setPanel(
 	<div className="flexible-grid-container">
 	    {exercises.map((exercise) => (
 		<div key={exercise.exercise_id} className="grid-item">
-		    <a href='#' onClick={() => EditExercise(setWidget, props, exercise)}>{exercise.name}</a>
+		    <a href='#' onClick={() => EditExercise(pseudoGlobal, exercise)}>{exercise.name}</a>
 		</div>
 	    ))}
 	</div>
     );
 }
 
-export function EditRoutineForm(setWidget, props, routine) {
-    setWidget(
+function EditRoutineForm(pseudoGlobal, routine) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+
+    setPanel(
 	<div className="form-group">
-	    <form id="EditRoutine" onSubmit={(e) => SaveRoutine(e, setWidget, props, routine)}>
+	    <form id="EditRoutine" onSubmit={(e) => SaveRoutine(e, pseudoGlobal, routine)}>
 		<input
 		    type='hidden'
 		    name='routine_id'
@@ -112,11 +121,13 @@ function decrementInteger(event, elementName) {
     console.log(elementName);
 }
 
-export function SaveRoutine(event, setWidget, props, routine) {
+function SaveRoutine(event, pseudoGlobal, routine) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
     const formValues = Object.fromEntries(formData.entries());
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
     
     console.log(formValues);
     
@@ -131,7 +142,7 @@ export function SaveRoutine(event, setWidget, props, routine) {
     })
     .then((response) => {
 	if (!response.ok) {
-	    setWidget(
+	    setPanel(
 		<div>
 		    <p><b>Error:</b> Status code {response.status}: {response.statusText || 'No further message'}</p>
 		</div>
@@ -142,18 +153,18 @@ export function SaveRoutine(event, setWidget, props, routine) {
     .then((json) => {
 	if (json.success) {
 	    if (json.updated) {
-		setWidget(
+		setPanel(
 		    <p>Routine updated!</p>
 		);
 	    }
 	    else {
-		setWidget(
+		setPanel(
 		    <p>Nothing to update!</p>
 		);
 	    }
 	}
 	else {
-	    setWidget(
+	    setPanel(
 		<p>Error: {json.error}</p>
 	    );
 	}
@@ -161,24 +172,33 @@ export function SaveRoutine(event, setWidget, props, routine) {
     
 }
     
-export function EditExercise(setWidget, props, exercise) {
-    setWidget(
+function EditExercise(pseudoGlobal, exercise) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+
+    setPanel(
 	<div>
 	    <p>Edit {exercise.name}</p>
 	</div>
     );
 }
     
-export function EditRoutines(setWidget, props, routines) {
+function EditRoutines(pseudoGlobal, routines) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+
     console.log(routines);
-    setWidget(
+    setPanel(
 	<div>XXX Not implemented yet XXX</div>
     );
 }
     
-export function EditExercises(setWidget, props, exercises) {
+function EditExercises(pseudoGlobal, exercises) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+
     console.log(exercises);
-    setWidget(
+    setPanel(
 	<div>XXX Also not implemented yet XXX</div>
     );
 }   

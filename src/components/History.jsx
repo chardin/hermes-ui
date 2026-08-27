@@ -3,7 +3,10 @@ import 'react-json-view-lite/dist/index.css';
 
 const expandToSecondLevel = (level) => level < 2;
 
-export function RecordHistory(setWidget, props, routine_id) {
+function RecordHistory(pseudoGlobal, routine_id) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+
     fetch('/api/record_history/' + routine_id, {
 	headers: {
 	    'Authorization': 'Bearer ' + props.token,
@@ -17,17 +20,20 @@ export function RecordHistory(setWidget, props, routine_id) {
     })
     .then((json) => {
 	if (json.success) {
-	    HistoryItem(setWidget, props, json.history_id);
+	    HistoryItem(pseudoGlobal, json.history_id);
 	}
 	else {
-	    setWidget(
+	    setPanel(
 		<p>Error: {json.error}</p>
 	    );
 	}
     });
 }
 
-export function HistoryItem(setWidget, props, history_id) {
+export function HistoryItem(pseudoGlobal, history_id) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+
     fetch('/api/history_detail/' + history_id, {
 	headers: {
 	    'Authorization': 'Bearer ' + props.token,
@@ -42,7 +48,7 @@ export function HistoryItem(setWidget, props, history_id) {
     .then((json) => {
 	if (json.success) {
 	    let notesVal = json.data.notes || '';
-	    setWidget(
+	    setPanel(
 		<div>
 		    <dl>
 			<dt>Name</dt>
@@ -51,7 +57,7 @@ export function HistoryItem(setWidget, props, history_id) {
 			<dd>{json.data.exercise_dt}</dd>
 			<dt>Notes</dt>
 			<dd>
-			    <form onSubmit={(e) => saveNotes(e, setWidget, props)}>
+			    <form onSubmit={(e) => saveNotes(e, pseudoGlobal)}>
 				<input type='hidden' name='history_id' value={json.history_id} />
 				<textarea id='notes'
 					  name='notes'
@@ -66,12 +72,12 @@ export function HistoryItem(setWidget, props, history_id) {
 		    </dl>
 		    <p>Exercise data:</p>
 		    <JsonView data={json.data.exercises} shouldExpandNode={expandToSecondLevel} style={darkStyles} />
-		    <button onClick={() => ConfirmDeleteHistoryItem(setWidget, props, json.history_id)}>Delete</button>
+		    <button onClick={() => ConfirmDeleteHistoryItem(pseudoGlobal, json.history_id)}>Delete</button>
 		</div>
 	    );
 	}
 	else {
-	    setWidget(
+	    setPanel(
 		<div>
 		    <p>Error: {json.error}</p>
 		</div>
@@ -80,11 +86,13 @@ export function HistoryItem(setWidget, props, history_id) {
     });
 }
 
-function saveNotes(e, setWidget, props) {
+function saveNotes(e, pseudoGlobal) {
     e.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
     const formValues = Object.fromEntries(formData.entries());
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
     
     fetch('/api/save_notes', {
 	method: 'POST',	    
@@ -103,10 +111,10 @@ function saveNotes(e, setWidget, props) {
     })
     .then((json) => {
 	if (json.success) {
-	    HistoryItem(setWidget, props, formValues.history_id);
+	    HistoryItem(pseudoGlobal, formValues.history_id);
 	}
 	else {
-	    setWidget(
+	    setPanel(
 		<p>Error: {json.error}</p>
 	    );
 	}
@@ -114,19 +122,24 @@ function saveNotes(e, setWidget, props) {
    
 }
     
-export function ConfirmDeleteHistoryItem(setWidget, props, history_id) {
-    setWidget(
+function ConfirmDeleteHistoryItem(pseudoGlobal, history_id) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+    setPanel(
 	<div>
 	    <p>Delete history item?</p>
 	    <br />
-	    <button onClick={() => DeleteHistoryItem(setWidget, props, history_id)}>Delete</button>
+	    <button onClick={() => DeleteHistoryItem(pseudoGlobal, history_id)}>Delete</button>
 	    &nbsp;
-	    <button onClick={() => GetHistoryList(setWidget, props, 0, 0)}>Cancel</button>
+	    <button onClick={() => GetHistoryList(pseudoGlobal, 0, 0)}>Cancel</button>
 	</div>
     );
 }
     
-function DeleteHistoryItem(setWidget, props, history_id) {
+function DeleteHistoryItem(pseudoGlobal, history_id) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+
     fetch('/api/delete_history/' + history_id, {
 	headers: {
 	    'Authorization': 'Bearer ' + props.token,
@@ -140,10 +153,10 @@ function DeleteHistoryItem(setWidget, props, history_id) {
     })
     .then((json) => {
 	if (json.success) {
-	    GetHistoryList(setWidget, props, 0, 0);
+	    GetHistoryList(pseudoGlobal, 0, 0);
 	}
 	else {
-	    setWidget(
+	    setPanel(
 		<div>
 		    <p>Error: {json.error}</p>
 		</div>
@@ -152,7 +165,10 @@ function DeleteHistoryItem(setWidget, props, history_id) {
     });
 }
     
-export function GetHistoryList(setWidget, props, page_num, num_rows) {
+export function GetHistoryList(pseudoGlobal, page_num, num_rows) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+    
     fetch('/api/routine_history/' + page_num + '/' + num_rows, {
 	headers: {
 	    'Authorization': 'Bearer ' + props.token,
@@ -161,7 +177,7 @@ export function GetHistoryList(setWidget, props, page_num, num_rows) {
     .then((response) => response.json())
     .then((json) => {
 	if (json.success) {
-	    setWidget(
+	    setPanel(
 		<div>
 		    <table style={{ width: '100%'}}>
 			<thead>
@@ -177,8 +193,8 @@ export function GetHistoryList(setWidget, props, page_num, num_rows) {
 				<tr key={entry.history_id}>
 				    <td>{entry.datetime}</td>
 				    <td>{entry.name}</td>
-				    <td><button onClick={() => HistoryItem(setWidget, props, entry.history_id)}>Details</button></td>
-				    <td><button onClick={() => ConfirmDeleteHistoryItem(setWidget, props, entry.history_id)}>Delete</button></td>
+				    <td><button onClick={() => HistoryItem(pseudoGlobal, entry.history_id)}>Details</button></td>
+				    <td><button onClick={() => ConfirmDeleteHistoryItem(pseudoGlobal, entry.history_id)}>Delete</button></td>
 				</tr>
 			    ))}
 			</tbody>
@@ -186,7 +202,7 @@ export function GetHistoryList(setWidget, props, page_num, num_rows) {
 			    <tr>
 				<th>
 				    {page_num > 0 ? (
-					<div><button onClick={() => GetHistoryList(setWidget, props, page_num - 1, num_rows)}>&larr;</button></div>
+					<div><button onClick={() => GetHistoryList(pseudoGlobal, page_num - 1, num_rows)}>&larr;</button></div>
 				    ) : (
 					' ')
 				    }
@@ -194,7 +210,7 @@ export function GetHistoryList(setWidget, props, page_num, num_rows) {
 				<th>&nbsp;</th>
 				<th>
 				    {json.next_page ? (
-					<div><button onClick={() => GetHistoryList(setWidget, props, page_num + 1, num_rows)}>&rarr;</button></div>
+					<div><button onClick={() => GetHistoryList(pseudoGlobal, page_num + 1, num_rows)}>&rarr;</button></div>
 				    ) : (
 					' '
 				    )}
@@ -207,7 +223,7 @@ export function GetHistoryList(setWidget, props, page_num, num_rows) {
 	    );
 	}
 	else {
-	    setWidget(
+	    setPanel(
 		<div>
 		    <p>Error: {json.error}</p>
 		</div>
@@ -216,8 +232,11 @@ export function GetHistoryList(setWidget, props, page_num, num_rows) {
     });
 }
 
-export function PlayAudio(setWidget, setBlobUrl, setWakeLock, props, routine){
-    setWidget(
+export function PlayAudio(pseudoGlobal, setBlobUrl, setWakeLock, routine){
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+    
+    setPanel(
 	<div>
 	    <p>Fetching...</p>
 	</div>
@@ -240,10 +259,10 @@ export function PlayAudio(setWidget, setBlobUrl, setWakeLock, props, routine){
 	setBlobUrl(blobUrl);
 	if (blobUrl) {
 	    let routineFilename = routine.name + '.mp3';
-	    setWidget(
+	    setPanel(
 		<div>
 		    <h1 style={{ textAlign: 'center', color: '#EDE8E4' }}>{routine.name}</h1>
-		    <audio controls src={blobUrl} onPlay={()=>requestWakeLock(setWakeLock)} onEnded={() => RecordHistory(setWidget, props, routine.routine_id)} />
+		    <audio controls src={blobUrl} onPlay={()=>requestWakeLock(setWakeLock)} onEnded={() => RecordHistory(pseudoGlobal, routine.routine_id)} />
 		    <h2 style={{ textAlign: 'center', color: '#EDE8E4' }}>or <a href={blobUrl} download={routineFilename} type="audio/mpeg" style={{ color: '#83CEEC' }}>download the audio</a></h2>
 		</div>
 	    );
