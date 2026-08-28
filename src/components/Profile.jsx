@@ -4,7 +4,7 @@ import Navbar from './Navbar';
 import { HistoryItem, GetHistoryList, PlayAudio } from './History';
 import { ChangePassForm } from './Password';
 import { DisplayUser, About, Fortune} from './UserMenu';
-import { ShowRoutines, ShowExercises } from './Editor';
+import { ShowRoutines, ShowExercises, LoadProfileData } from './Editor';
 import heroImage from '../assets/hero-small.png';
 import './Grid.css';
 
@@ -18,6 +18,7 @@ function Profile(props) {
     const [blobUrl, setBlobUrl] = useState(null);
 
     let pseudoGlobal = {'props': props,
+			'setLoading': setLoading,
 			'setPanel': setPanel,
 			'profileData': profileData,
 			'setProfileData': setProfileData};
@@ -40,17 +41,7 @@ function Profile(props) {
     }
 
     useEffect(() => {
-	fetch('/api/profile', {
-	    headers: {
-		Authorization: 'Bearer ' + props.token
-	    }
-	})
-        .then((response) => response.json())
-	.then((json) => {
-	    setProfileData(json);
-	    setLoading(false);}
-	)
-	.catch((error) => console.error('Error fetching profile data:', error));
+	LoadProfileData(pseudoGlobal);
 	setMenuData(false);
     }, []);
     if (loading) return <p>Loading...</p>;
@@ -88,10 +79,10 @@ function Profile(props) {
 		submenu: [
 		    { text: 'Routines',
 		      url: '#',
-		      onClick: () => ShowRoutines(pseudoGlobal, profileData.routines), },
+		      onClick: () => ShowRoutines(pseudoGlobal), },
 		    { text: 'Exercises',
 		      url: '#',
-		      onClick: () => ShowExercises(pseudoGlobal, profileData.exercises), },
+		      onClick: () => ShowExercises(pseudoGlobal), },
 		]
 	    },
 	]);

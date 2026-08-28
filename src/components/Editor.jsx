@@ -1,3 +1,22 @@
+export function LoadProfileData(pseudoGlobal) {
+    const props = pseudoGlobal.props;
+    const profileData = pseudoGlobal.profileData;
+    const setProfileData = pseudoGlobal.setProfileData;
+    const setLoading = pseudoGlobal.setLoading;
+
+    fetch('/api/profile', {
+	headers: {
+	    Authorization: 'Bearer ' + props.token
+	}
+    })
+    .then((response) => response.json())
+    .then((json) => {
+	setProfileData(json);
+	setLoading(false);}
+    )
+    .catch((error) => console.error('Error fetching profile data:', error));
+}
+
 export function ShowRoutines(pseudoGlobal) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
@@ -130,8 +149,7 @@ function SaveRoutine(event, pseudoGlobal, routine) {
     const formValues = Object.fromEntries(formData.entries());
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
-    
-    console.log(formValues);
+    const setProfileData = pseudoGlobal.setProfileData;
     
     fetch('/api/save_routine', {
 	method: 'POST',	    
@@ -155,6 +173,7 @@ function SaveRoutine(event, pseudoGlobal, routine) {
     .then((json) => {
 	if (json.success) {
 	    if (json.updated) {
+		LoadProfileData(pseudoGlobal);
 		setPanel(
 		    <p>Routine updated!</p>
 		);
@@ -190,7 +209,6 @@ function EditRoutines(pseudoGlobal) {
     const setPanel = pseudoGlobal.setPanel;
     const routines = pseudoGlobal.profileData.routines;
 
-    console.log(routines);
     setPanel(
 	<div>XXX Not implemented yet XXX</div>
     );
@@ -201,7 +219,6 @@ function EditExercises(pseudoGlobal) {
     const setPanel = pseudoGlobal.setPanel;
     const exercises = pseudoGlobal.profileData.exercises;
 
-    console.log(exercises);
     setPanel(
 	<div>XXX Also not implemented yet XXX</div>
     );
