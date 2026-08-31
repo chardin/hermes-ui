@@ -1,22 +1,3 @@
-export function LoadProfileData(pseudoGlobal) {
-    const props = pseudoGlobal.props;
-    const profileData = pseudoGlobal.profileData;
-    const setProfileData = pseudoGlobal.setProfileData;
-    const setLoading = pseudoGlobal.setLoading;
-
-    fetch('/api/profile', {
-	headers: {
-	    Authorization: 'Bearer ' + props.token
-	}
-    })
-    .then((response) => response.json())
-    .then((json) => {
-	setProfileData(json);
-	setLoading(false);}
-    )
-    .catch((error) => console.error('Error fetching profile data:', error));
-}
-
 export function ShowRoutines(pseudoGlobal) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;

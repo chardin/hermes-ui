@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import { HistoryItem, GetHistoryList, PlayAudio } from './History';
 import { ChangePassForm } from './Password';
-import { DisplayUser, About, Fortune} from './UserMenu';
-import { ShowRoutines, ShowExercises, LoadProfileData } from './Editor';
+import { DisplayUser, About, Fortune, LoadProfileData } from './UserMenu';
+import { ShowRoutines, ShowExercises } from './Editor';
 import heroImage from '../assets/hero-small.png';
 import './Grid.css';
 
