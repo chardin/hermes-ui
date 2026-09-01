@@ -70,7 +70,8 @@ export function HistoryItem(pseudoGlobal, history_id) {
 			    </form>
 			</dd>
 		    </dl>
-		    <p>Exercise data:</p>
+		    <p>Exercise data: &nbsp;
+		    <button onClick={() => DownloadHistoryItem(pseudoGlobal, json.data.exercises)}>Download the JSON</button></p>
 		    <JsonView data={json.data.exercises} shouldExpandNode={expandToSecondLevel} style={darkStyles} />
 		    <button onClick={() => ConfirmDeleteHistoryItem(pseudoGlobal, json.history_id)}>Delete</button>
 		</div>
@@ -122,6 +123,23 @@ function saveNotes(e, pseudoGlobal) {
    
 }
     
+function DownloadHistoryItem(pseudoGlobal, exercise_data) {
+    const props = pseudoGlobal.props;
+    const setPanel = pseudoGlobal.setPanel;
+
+    const blob = new Blob([JSON.stringify(exercise_data, null, 2)],
+			  { type: 'application/json' });
+
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = 'exercise_data.json';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(link.href);
+}
+
 function ConfirmDeleteHistoryItem(pseudoGlobal, history_id) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
