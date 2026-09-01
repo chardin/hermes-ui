@@ -232,41 +232,71 @@ export function GetHistoryList(pseudoGlobal, page_num, num_rows) {
     });
 }
 
-export function PlayAudio(pseudoGlobal, setBlobUrl, setWakeLock, routine){
+export function PlayAudio(pseudoGlobal, routine) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
+    const setBlobUrl = pseudoGlobal.setBlobUrl;
+    const setWakeLock = pseudoGlobal.setWakeLock;
     
     setPanel(
 	<div>
 	    <p>Fetching...</p>
 	</div>
     );
-    fetch(routine.audio_path, {
+        fetch('/api/routine/' + routine.routine_id, {
+	method: 'GET',	    
 	headers: {
 	    'Authorization': 'Bearer ' + props.token,
 	},
     })
     .then((response) => {
 	if (!response.ok) {
-	   throw new Error("HTTP error! Status: ${response.status}");
-	}
-	return response.blob();
-    })
-    .then((audioBlob) => {
-	return URL.createObjectURL(audioBlob);	
-    })
-    .then((blobUrl) => {
-	setBlobUrl(blobUrl);
-	if (blobUrl) {
-	    let routineFilename = routine.name + '.mp3';
 	    setPanel(
 		<div>
-		    <h1 style={{ textAlign: 'center', color: '#EDE8E4' }}>{routine.name}</h1>
-		    <audio controls src={blobUrl} onPlay={()=>requestWakeLock(setWakeLock)} onEnded={() => RecordHistory(pseudoGlobal, routine.routine_id)} />
-		    <h2 style={{ textAlign: 'center', color: '#EDE8E4' }}>or <a href={blobUrl} download={routineFilename} type="audio/mpeg" style={{ color: '#83CEEC' }}>download the audio</a></h2>
+		    <p><b>Error:</b> Status code {response.status}: {response.statusText || 'No further message'}</p>
 		</div>
 	    );
 	}
+	return response.json();
+    })
+    .then((json) => {
+	if (json.success) {
+	    return json.routine;
+	}
+	else {
+	    setPanel(
+		<p>Error: {json.error}</p>
+	    );
+	}
+    })
+    .then((routine) => {    
+	fetch(routine.audio_path, {
+	    headers: {
+		'Authorization': 'Bearer ' + props.token,
+	    },
+	})
+	.then((response) => {
+	    if (!response.ok) {
+		throw new Error("HTTP error! Status: ${response.status}");
+	    }
+	    return response.blob();
+	})
+	.then((audioBlob) => {
+	    return URL.createObjectURL(audioBlob);	
+	})
+	.then((blobUrl) => {
+	    setBlobUrl(blobUrl);
+	    if (blobUrl) {
+		let routineFilename = routine.name + '.mp3';
+		setPanel(
+		    <div>
+			<h1 style={{ textAlign: 'center', color: '#EDE8E4' }}>{routine.name}</h1>
+			<audio controls src={blobUrl} onPlay={()=>requestWakeLock(setWakeLock)} onEnded={() => RecordHistory(pseudoGlobal, routine.routine_id)} />
+			<h2 style={{ textAlign: 'center', color: '#EDE8E4' }}>or <a href={blobUrl} download={routineFilename} type="audio/mpeg" style={{ color: '#83CEEC' }}>download the audio</a></h2>
+		    </div>
+		);
+	    }
+	})
     });
 }
 

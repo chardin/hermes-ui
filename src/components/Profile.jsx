@@ -16,10 +16,16 @@ function Profile(props) {
     const [menuData, setMenuData] = useState(null);
     const [name, setName] = useState('');
     const [blobUrl, setBlobUrl] = useState(null);
+    const [exercises, setExercises] = useState([]);
+    const [routines, setRoutines] = useState([]);
 
     let pseudoGlobal = {'props': props,
 			'setLoading': setLoading,
 			'setPanel': setPanel,
+			'setExercises': setPanel,
+			'setRoutines': setRoutines,
+			'setBlobUrl': setBlobUrl,
+			'setWakeLock': setWakeLock,
 			'profileData': profileData,
 			'setProfileData': setProfileData};
     
@@ -62,11 +68,7 @@ function Profile(props) {
 	    {
 		text: 'Play',
 		url: '#',
-		submenu: profileData.routines.sort((a, b) => a.name.localeCompare(b.name)).map((routine) => (
-		    { text: routine.name,
-		      url: '#',
-		      onClick: () => PlayAudio(pseudoGlobal, setBlobUrl, setWakeLock, routine)
-		    }))
+		onClick: () => ShowRoutines(pseudoGlobal, 'play')
 	    },
 	    {
 		text: 'History',
@@ -79,7 +81,7 @@ function Profile(props) {
 		submenu: [
 		    { text: 'Routines',
 		      url: '#',
-		      onClick: () => ShowRoutines(pseudoGlobal), },
+		      onClick: () => ShowRoutines(pseudoGlobal, 'edit'), },
 		    { text: 'Exercises',
 		      url: '#',
 		      onClick: () => ShowExercises(pseudoGlobal), },

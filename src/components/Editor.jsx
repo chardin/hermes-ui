@@ -1,18 +1,60 @@
-export function ShowRoutines(pseudoGlobal) {
+import { PlayAudio } from './History';
+
+export function ShowRoutines(pseudoGlobal, fn) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
-    const routines = pseudoGlobal.profileData.routines;
-    
-    routines.sort((a, b) => a.name.localeCompare(b.name));
-    setPanel(
-	<div className="flexible-grid-container">
-	    {routines.map((routine) => (
-		<div key={routine.routine_id} className="grid-item">
-		    <a href='#' key={'link'+routine.routine_id} onClick={() => EditRoutineForm(pseudoGlobal, routine)}>{routine.name}</a>
+    const setRoutines = pseudoGlobal.setRoutines;
+
+    function functionDispatchTable(pg, r, f) {
+	if (fn == 'edit') {
+	    return EditRoutineForm(pg, r);
+	}
+	if (fn == 'play') {
+	    return PlayAudio(pg, r);
+	}
+	console.error('Function ' + fn + 'not supported');
+    }
+
+    fetch('/api/routines', {
+	method: 'GET',	    
+	headers: {
+	    'Authorization': 'Bearer ' + props.token,
+	},
+    })
+    .then((response) => {
+	if (!response.ok) {
+	    setPanel(
+		<div>
+		    <p><b>Error:</b> Status code {response.status}: {response.statusText || 'No further message'}</p>
 		</div>
-	    ))}
-	</div>
-    );
+	    );
+	}
+	return response.json();
+    })
+    .then((json) => {
+	if (json.success) {
+	    return json.routines;
+	}
+	else {
+	    setPanel(
+		<p>Error: {json.error}</p>
+	    );
+	}
+    })
+    .then((routines) => {    
+	setRoutines(routines);
+    
+	routines.sort((a, b) => a.name.localeCompare(b.name));
+	setPanel(
+	    <div className="flexible-grid-container">
+		{routines.map((routine) => (
+		    <div key={routine.routine_id} className="grid-item">
+			<a href='#' key={'link'+routine.routine_id} onClick={() => functionDispatchTable(pseudoGlobal, routine, fn)}>{routine.name}</a>
+		    </div>
+		))}
+	    </div>
+	);
+    });
 }
     
 export function ShowExercises(pseudoGlobal) {
@@ -36,70 +78,98 @@ function EditRoutineForm(pseudoGlobal, routine) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
 
-    setPanel(
-	<div className="form-group">
-	    <form id="EditRoutine" onSubmit={(e) => SaveRoutine(e, pseudoGlobal, routine)}>
-		<input
-		    type='hidden'
-		    name='routine_id'
-		    key='routine_id'
-		    defaultValue={routine.routine_id}
-		/>
-		<label htmlFor="name">Name:</label>
-		<input
-		    name='name'
-		    id='name'
-		    key='name'
-		    type='text'
-		    defaultValue={routine.name}
-		    required
-		/>
-		<br />
-		<h3>Exercises:</h3>
-		<table>
-		    <colgroup>
-			<col style={{width: 'auto'}} />
-			<col style={{width: '150px'}} />
-			<col style={{width: '150px'}} />
-			<col style={{width: '150px'}} />
-			<col style={{width: '150px'}} />
-		    </colgroup>
-		    <thead>
-			<tr>
-			    <th>Name</th>
-			    <th>Order</th>
-			    <th>Sets</th>
-			    <th>Reps</th>
-			    <th>Paused?</th>
-			</tr>
-		    </thead>
-		    <tbody>
-		{routine.exercises.map((exercise) => (
-		    <tr key={'exercise-'+exercise.exercise_id}>
-			<td>
-			    <p>{exercise.name}</p>
-			</td>
-			{IntegerWidget('order', exercise.exercise_id, exercise.order)}
-			{IntegerWidget('num_sets', exercise.exercise_id, exercise.num_sets)}
-			{IntegerWidget('num_reps', exercise.exercise_id, exercise.num_reps)}
-			<td>
-			    <input
-				name={'is_paused-' + exercise.exercise_id}
-				id={'is_paused-' + exercise.exercise_id}
-				key={'is_paused-' + exercise.exercise_id}
-				type='checkbox'
-				value='selected'
-				defaultChecked={exercise.is_paused}				    
-			    />
-			</td>
-		    </tr>
-		))}
-		    </tbody>
-		</table>			
-		<button type="submit">Save Routine</button>
-	    </form>
-	</div>
-    );
+    fetch('/api/routine/' + routine.routine_id, {
+	method: 'GET',	    
+	headers: {
+	    'Authorization': 'Bearer ' + props.token,
+	},
+    })
+    .then((response) => {
+	if (!response.ok) {
+	    setPanel(
+		<div>
+		    <p><b>Error:</b> Status code {response.status}: {response.statusText || 'No further message'}</p>
+		</div>
+	    );
+	}
+	return response.json();
+    })
+    .then((json) => {
+	if (json.success) {
+	    return json.routine;
+	}
+	else {
+	    setPanel(
+		<p>Error: {json.error}</p>
+	    );
+	}
+    })
+    .then((routine) => {    
+	setPanel(
+	    <div className="form-group">
+		<form id="EditRoutine" onSubmit={(e) => SaveRoutine(e, pseudoGlobal, routine)}>
+		    <input
+			type='hidden'
+			name='routine_id'
+			key='routine_id'
+			defaultValue={routine.routine_id}
+		    />
+		    <label htmlFor="name">Name:</label>
+		    <input
+			name='name'
+			id='name'
+			key='name'
+			type='text'
+			defaultValue={routine.name}
+			required
+		    />
+		    <br />
+		    <h3>Exercises:</h3>
+		    <table>
+			<colgroup>
+			    <col style={{width: 'auto'}} />
+			    <col style={{width: '150px'}} />
+			    <col style={{width: '150px'}} />
+			    <col style={{width: '150px'}} />
+			    <col style={{width: '150px'}} />
+			</colgroup>
+			<thead>
+			    <tr>
+				<th>Name</th>
+				<th>Order</th>
+				<th>Sets</th>
+				<th>Reps</th>
+				<th>Paused?</th>
+			    </tr>
+			</thead>
+			<tbody>
+			    {routine.exercises.map((exercise) => (
+				<tr key={'exercise-'+exercise.exercise_id}>
+				    <td>
+					<p>{exercise.name}</p>
+				    </td>
+				    {IntegerWidget('order', exercise.exercise_id, exercise.order)}
+				    {IntegerWidget('num_sets', exercise.exercise_id, exercise.num_sets)}
+				    {IntegerWidget('num_reps', exercise.exercise_id, exercise.num_reps)}
+				    <td>
+					<input
+					    name={'is_paused-' + exercise.exercise_id}
+					    id={'is_paused-' + exercise.exercise_id}
+					    key={'is_paused-' + exercise.exercise_id}
+					    type='checkbox'
+					    value='selected'
+					    defaultChecked={exercise.is_paused}				    
+					/>
+				    </td>
+				</tr>
+			    ))}
+			</tbody>
+		    </table>			
+		    <button type="submit">Save Routine</button>
+		</form>
+	    </div>
+	);
+    });
 }
 
 function IntegerWidget(baseName, id, defaultValue) {
@@ -131,7 +201,7 @@ function SaveRoutine(event, pseudoGlobal, routine) {
     const props = pseudoGlobal.props;
     const setPanel = pseudoGlobal.setPanel;
     const setProfileData = pseudoGlobal.setProfileData;
-    
+
     fetch('/api/save_routine', {
 	method: 'POST',	    
 	headers: {
@@ -154,7 +224,6 @@ function SaveRoutine(event, pseudoGlobal, routine) {
     .then((json) => {
 	if (json.success) {
 	    if (json.updated) {
-		LoadProfileData(pseudoGlobal);
 		setPanel(
 		    <p>Routine updated!</p>
 		);
@@ -204,3 +273,5 @@ function EditExercises(pseudoGlobal) {
 	<div>XXX Also not implemented yet XXX</div>
     );
 }   
+
+    
