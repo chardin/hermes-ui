@@ -76,7 +76,7 @@ function Profile(props) {
 		onClick: () => GetHistoryList(pseudoGlobal, 0, 0)
 	    },
 	    {
-		text: 'Edit XXX',
+		text: 'Edit',
 		url: '#',
 		submenu: [
 		    { text: 'Routines',
