@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import { HistoryItem, GetHistoryList, PlayAudio } from './History';
 import { ChangePassForm } from './Password';
-import { DisplayUser, About, Fortune} from './UserMenu';
-import { ShowRoutines, ShowExercises, LoadProfileData } from './Editor';
+import { DisplayUser, About, Fortune, LoadProfileData } from './UserMenu';
+import { ShowRoutines, ShowExercises } from './Editor';
 import heroImage from '../assets/hero-small.png';
 import './Grid.css';
 
@@ -16,10 +16,16 @@ function Profile(props) {
     const [menuData, setMenuData] = useState(null);
     const [name, setName] = useState('');
     const [blobUrl, setBlobUrl] = useState(null);
+    const [exercises, setExercises] = useState([]);
+    const [routines, setRoutines] = useState([]);
 
     let pseudoGlobal = {'props': props,
 			'setLoading': setLoading,
 			'setPanel': setPanel,
+			'setExercises': setPanel,
+			'setRoutines': setRoutines,
+			'setBlobUrl': setBlobUrl,
+			'setWakeLock': setWakeLock,
 			'profileData': profileData,
 			'setProfileData': setProfileData};
     
@@ -62,11 +68,7 @@ function Profile(props) {
 	    {
 		text: 'Play',
 		url: '#',
-		submenu: profileData.routines.sort((a, b) => a.name.localeCompare(b.name)).map((routine) => (
-		    { text: routine.name,
-		      url: '#',
-		      onClick: () => PlayAudio(pseudoGlobal, setBlobUrl, setWakeLock, routine)
-		    }))
+		onClick: () => ShowRoutines(pseudoGlobal, 'play')
 	    },
 	    {
 		text: 'History',
@@ -74,12 +76,12 @@ function Profile(props) {
 		onClick: () => GetHistoryList(pseudoGlobal, 0, 0)
 	    },
 	    {
-		text: 'Edit XXX',
+		text: 'Edit',
 		url: '#',
 		submenu: [
 		    { text: 'Routines',
 		      url: '#',
-		      onClick: () => ShowRoutines(pseudoGlobal), },
+		      onClick: () => ShowRoutines(pseudoGlobal, 'edit'), },
 		    { text: 'Exercises',
 		      url: '#',
 		      onClick: () => ShowExercises(pseudoGlobal), },

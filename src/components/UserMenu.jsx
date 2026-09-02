@@ -1,24 +1,44 @@
+export function LoadProfileData(pseudoGlobal) {
+    const props = pseudoGlobal.props;
+    const profileData = pseudoGlobal.profileData;
+    const setProfileData = pseudoGlobal.setProfileData;
+    const setLoading = pseudoGlobal.setLoading;
+
+    fetch('/api/profile', {
+	headers: {
+	    Authorization: 'Bearer ' + props.token
+	}
+    })
+    .then((response) => response.json())
+    .then((json) => {
+	setProfileData(json);
+	setLoading(false);}
+    )
+    .catch((error) => console.error('Error fetching profile data:', error));
+}
+
 export function DisplayUser(pseudoGlobal) {
     const setPanel = pseudoGlobal.setPanel;
     const profileData = pseudoGlobal.profileData;
-    
+
+    LoadProfileData(pseudoGlobal);
     setPanel(
 	<div>
 	    <dl>
 		<dt>Username</dt>
-		<dd>{profileData.username}</dd>
+		<dd>{profileData.user.username}</dd>
 	    </dl>
 	    <dl>
 		<dt>Full Name</dt>
-		<dd>{profileData.full_name}</dd>		
+		<dd>{profileData.user.full_name}</dd>		
 	    </dl>
 	    <dl>
 		<dt>Admin?</dt>
-		<dd>{profileData.is_admin ? 'Yes' : 'No'}</dd>		
+		<dd>{profileData.user.is_admin ? 'Yes' : 'No'}</dd>		
 	    </dl>
 	    <dl>
 		<dt>Timezone</dt>
-		<dd>{profileData.timezone}</dd>		
+		<dd>{profileData.user.timezone}</dd>		
 	    </dl>
 	</div>
     );
