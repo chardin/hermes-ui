@@ -362,6 +362,7 @@ function IntegerWidget(baseName, id, defaultValue) {
 		key={elementName}
 		size="2"
 		type='text'
+		inputMode='numeric'
 		defaultValue={defaultValue}
 		required
 	    />
